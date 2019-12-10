@@ -86,9 +86,10 @@
 					questions.push({id:id++, qtext:q, qtext2:"How confident are you about your response?", label1:"Absolutely confident", label2:"Not at all confident"});
 				}
 				//This question is always last
-				questions.push({id:14, qtext:"Leaving the EU will be positive for the United Kingdom", qtext2:"How strongly do you agree?", label1:"Strongly agree",label2:"Strongly disagree"})
-				questions.push({id:16, qtext:"Leaving the EU will be positive for the United Kingdom", qtext2:"How confident are you about your response?", label1:"Absolutely confident", label2:"Not at all confident"});
+				questions.push({id:questions.length, qtext:"Leaving the EU will be positive for the United Kingdom", qtext2:"How strongly do you agree?", label1:"Strongly agree",label2:"Strongly disagree"})
+				questions.push({id:questions.length, qtext:"Leaving the EU will be positive for the United Kingdom", qtext2:"How confident are you about your response?", label1:"Absolutely confident", label2:"Not at all confident"});
 				return questions;
+				//TODO: Fix so that "id" property is constant and not suffled
 			}
 			var current_q=-1; //start at -1 
 			var questions=init();
