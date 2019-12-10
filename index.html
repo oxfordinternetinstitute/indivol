@@ -1,6 +1,6 @@
 <html>
 	<head>
-		<script src="https://code.jquery.com/jquery-3.4.1.js"></script>
+		<script src="js/jquery-3.4.1.js"></script>
 		<script language="javascript">
 		$(function(){
 			$(".vas-scale").click(function(e) {
@@ -10,6 +10,50 @@
 				$(this).children("input").val(val);
 				$(this).children(".vas-dot").show().css({"margin-top":val-8});
 			});
+
+			$(".next").click(function(e) {
+				var v=$("#vas_value").val();
+				if (v=="NA") {
+					return false;
+				}
+				//console.log(v);
+				questions[current_q]["val"]=v;
+				loadnextvasq();
+			});
+
+			function loadnextvasq(){
+				var i=++current_q;
+				if (i<questions.length){
+					loadvasq(questions[i]["qtext"],questions[i]["qtext2"],questions[i]["label1"],questions[i]["label2"]);
+				} else {
+					console.log(questions); 
+					//TODO: Save questions to server with unqiue user id.
+					//TODO: Send to post-experiment questionaire
+				}
+
+			}
+
+			function loadvasq(qtext,qtext2,label1="Strongly agree",label2="Strongly disagree",social_info="") {
+				$("#qtext").text(qtext);
+				$("#qtext2").text(qtext2);
+				$("#label1").text(label1);
+				$("#label2").text(label2);
+				$(".vas-dot").hide();
+				//TODO: Social info
+			}
+
+
+			var current_q=-1; //start at -1 
+			var questions=[
+				{id:0, qtext:"a", qtext2:"How strongly do you agree?", label1:"Strongly agree",label2:"Strongly disagree"},
+				{id:1, qtext:"a", qtext2:"How confident are you about your response?", label1:"Absolutely confident", label2:"Not at all confident"},
+				{id:2, qtext:"b", qtext2:"How strongly do you agree?", label1:"Strongly agree",label2:"Strongly disagree"},
+				{id:3, qtext:"b", qtext2:"How confident are you about your response?", label1:"Absolutely confident", label2:"Not at all confident"},
+				{id:4, qtext:"c", qtext2:"How strongly do you agree?", label1:"Strongly agree",label2:"Strongly disagree"},
+				{id:5, qtext:"c", qtext2:"How confident are you about your response?", label1:"Absolutely confident", label2:"Not at all confident"},
+			];
+			loadnextvasq();
+
 		});
 		</script>
 		<link rel="stylesheet" href="css/vas.css" type="text/css" media="screen" />
@@ -17,17 +61,20 @@
 	</head>
 	<body>
 		
-		<h1>This is awesome</h1>
+		<h2 id="qtext">This is awesome</h2>
+		<h1 id="qtext2">How strongly do you agree?</h1>
 
 		<div class="vas">
-			<div class="vas-label">Strongly agree</div>
+			<div class="vas-label" id="label1">Strongly agree</div>
 			<div class="vas-scale">
 				<div class="vas-line"></div>
 				<div class="vas-dot"></div>
-				<input type="hidden" name="xxx_unq_name" value="NA">
+				<input type="hidden" id="vas_value" name="vas_value" value="NA">
 			</div>
-			<div class="vas-label">Strongly disagree</div>
+			<div class="vas-label" id="label2">Strongly disagree</div>
 		</div>
+
+		<div class="next"><a href="javascript:void(0);">Next</a></div>
 
 	</body>
 </html>

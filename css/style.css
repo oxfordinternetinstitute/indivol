@@ -1,5 +1,20 @@
 h1 {
 	text-align: center;
 	font-size: 150%;
+	font-weight: bolder;
+}
+
+h2 {
+	text-align: center;
+	font-size: 125%;
 	font-weight: bold;
+}
+
+
+.next {
+	float: right;
+	margin-right: 20%;
+	width: 150px;
+	text-align: center;
+	background-color: aqua;
 }
