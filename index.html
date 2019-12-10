@@ -1,0 +1,33 @@
+<html>
+	<head>
+		<script src="https://code.jquery.com/jquery-3.4.1.js"></script>
+		<script language="javascript">
+		$(function(){
+			$(".vas-scale").click(function(e) {
+				var posX = $(this).offset().left, posY = $(this).offset().top;
+				var val=e.pageY - posY;
+				//console.log(val);
+				$(this).children("input").val(val);
+				$(this).children(".vas-dot").show().css({"margin-top":val-8});
+			});
+		});
+		</script>
+		<link rel="stylesheet" href="css/vas.css" type="text/css" media="screen" />
+		<link rel="stylesheet" href="css/style.css" type="text/css" media="screen" />
+	</head>
+	<body>
+		
+		<h1>This is awesome</h1>
+
+		<div class="vas">
+			<div class="vas-label">Strongly agree</div>
+			<div class="vas-scale">
+				<div class="vas-line"></div>
+				<div class="vas-dot"></div>
+				<input type="hidden" name="xxx_unq_name" value="NA">
+			</div>
+			<div class="vas-label">Strongly disagree</div>
+		</div>
+
+	</body>
+</html>
