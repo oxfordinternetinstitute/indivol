@@ -17,7 +17,9 @@
 					return false;
 				}
 				//console.log(v);
-				questions[current_q]["val"]=v;
+				if (current_q<questions.length) {
+					questions[current_q]["val"]=v;
+				}
 				loadnextvasq();
 			});
 
@@ -42,17 +44,54 @@
 				//TODO: Social info
 			}
 
+			function shuffle(array) {
+				var currentIndex = array.length, temporaryValue, randomIndex;
 
+				// While there remain elements to shuffle...
+				while (0 !== currentIndex) {
+
+					// Pick a remaining element...
+					randomIndex = Math.floor(Math.random() * currentIndex);
+					currentIndex -= 1;
+
+					// And swap it with the current element.
+					temporaryValue = array[currentIndex];
+					array[currentIndex] = array[randomIndex];
+					array[randomIndex] = temporaryValue;
+				}
+
+				return array;
+			}
+
+			function init(){
+			
+				var raw_qs=[
+					"The government should be doing more to tackle climate change",
+					"The government should take more steps to reduce social inequality",
+					"The government should do more to protect human rights regardless of race, religion etc.",
+					"Gender inequality is a big issue in the UK",
+					"It is important to ensure LGBTQ+ people have the same rights as other members of society",
+					"The government should reduce the level of immigration into Britain",
+					"NHS patients' data should be made available for academic medical research",
+					"Misinformation is a big issue today"
+					//Leaving the EU will be positive for the United Kingdom
+				];
+				raw_qs=shuffle(raw_qs);
+				
+				var questions=[];
+				var id=0;
+				for (var i=0; i<raw_qs.length; i++){
+					var q=raw_qs[i];
+					questions.push({id:id++, qtext:q, qtext2:"How strongly do you agree?", label1:"Strongly agree",label2:"Strongly disagree"});
+					questions.push({id:id++, qtext:q, qtext2:"How confident are you about your response?", label1:"Absolutely confident", label2:"Not at all confident"});
+				}
+				//This question is always last
+				questions.push({id:14, qtext:"Leaving the EU will be positive for the United Kingdom", qtext2:"How strongly do you agree?", label1:"Strongly agree",label2:"Strongly disagree"})
+				questions.push({id:16, qtext:"Leaving the EU will be positive for the United Kingdom", qtext2:"How confident are you about your response?", label1:"Absolutely confident", label2:"Not at all confident"});
+				return questions;
+			}
 			var current_q=-1; //start at -1 
-			var questions=[
-				{id:0, qtext:"a", qtext2:"How strongly do you agree?", label1:"Strongly agree",label2:"Strongly disagree"},
-				{id:1, qtext:"a", qtext2:"How confident are you about your response?", label1:"Absolutely confident", label2:"Not at all confident"},
-				{id:2, qtext:"b", qtext2:"How strongly do you agree?", label1:"Strongly agree",label2:"Strongly disagree"},
-				{id:3, qtext:"b", qtext2:"How confident are you about your response?", label1:"Absolutely confident", label2:"Not at all confident"},
-				{id:4, qtext:"c", qtext2:"How strongly do you agree?", label1:"Strongly agree",label2:"Strongly disagree"},
-				{id:5, qtext:"c", qtext2:"How confident are you about your response?", label1:"Absolutely confident", label2:"Not at all confident"},
-			];
-			//TODO: Shuffle questions but maintain groupings (or probably better shuffle without confidence questions and then insert these into the array after shuffeling)
+			var questions=init();
 			loadnextvasq();
 
 		});
@@ -62,8 +101,8 @@
 	</head>
 	<body>
 		
-		<h2 id="qtext">This is awesome</h2>
 		<h1 id="qtext2">How strongly do you agree?</h1>
+		<h2 id="qtext">This is awesome</h2>
 
 		<div class="vas">
 			<div class="vas-label" id="label1">Strongly agree</div>
