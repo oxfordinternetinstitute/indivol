@@ -1,4 +1,5 @@
 <html>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<head>
 		<script src="js/jquery-3.4.1.js"></script>
 		<script language="javascript">
@@ -29,7 +30,7 @@
 					loadvasq(questions[i]["qtext"],questions[i]["qtext2"],questions[i]["label1"],questions[i]["label2"]);
 				} else {
 					console.log(questions); 
-					//TODO: Save questions to server with unqiue user id.
+					//TODO: Save questions to server with unique user id.
 					//TODO: Send to post-experiment questionaire
 				}
 
@@ -63,7 +64,8 @@
 				return array;
 			}
 
-			function init(){
+			function init()
+			{
 		
 				var raw_qs=[
 					"The government should be doing more to tackle climate change",
@@ -81,7 +83,8 @@
 				
 				var questions=[];
 				var id=0;
-				for (var i=0; i<raw_qs.length; i++){
+				for (var i=0; i<raw_qs.length; i++)
+				{
 					var q=raw_qs[i];
 					questions.push({id:id++, qtext:q, qtext2:"How much do you agree with the following?", label1:"Strongly agree",label2:"Strongly disagree"});
 					questions.push({id:id++, qtext:q, qtext2:"How important is this issue to the UK?", label1:"Very important", label2:"Not important at all"});
@@ -90,16 +93,18 @@
 				questions.push({id:questions.length, qtext:"Leaving the EU will be positive for the United Kingdom", qtext2:"How much do you agree with the following?", label1:"Strongly agree",label2:"Strongly disagree"})
 				questions.push({id:questions.length, qtext:"Leaving the EU will be positive for the United Kingdom", qtext2:"How important is this issue to the UK?", label1:"Very important", label2:"Not important at all"});
 				return questions;
-				//TODO: Fix so that "id" property is constant and not suffled
+				//TODO: Fix so that "id" property is constant and not shuffled
 			}
 			var current_q=-1; //start at -1 
+
 			var questions=init();
 			loadnextvasq();
 
 		});
 		</script>
-		<link rel="stylesheet" href="css/vas.css" type="text/css" media="screen" />
-		<link rel="stylesheet" href="css/style.css" type="text/css" media="screen" />
+
+	<link rel="stylesheet" href="css/vas.css" type="text/css" media="screen" />
+	<link rel="stylesheet" href="css/style.css" type="text/css" media="screen" />
 	</head>
 	<body>
 		
