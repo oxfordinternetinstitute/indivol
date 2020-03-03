@@ -4,7 +4,8 @@
 		<script src="js/jquery-3.4.1.js"></script>
 		<script language="javascript">
 		$(function(){
-			$(".vas-scale").click(function(e) {
+			$(".vas-scale").click(function(e)
+			{
 				var posX = $(this).offset().left, posY = $(this).offset().top;
 				var val=e.pageY - posY;
 				//console.log(val);
@@ -12,44 +13,119 @@
 				$(this).children(".vas-dot").show().css({"margin-top":val-8});
 			});
 
-			$(".next").click(function(e) {
-				var v=$("#vas_value").val();
-				if (v=="NA") {
-					return false;
+			$(".next").click(function(e)
+			{
+				if (false) // for debugging
+				//if( is_question ) 
+				{
+					var v=$("#vas_value").val();
+					//console.log("vas_value =", v)
+
+					if( (v=="NA"))
+					{
+						return false;
+					}
+					if (current_q<questions.length)
+					{
+						questions[current_q]["val"]=v;
+
+						// Reset value (for some reason it requires that)
+						$("#vas_value").val("NA")
+					}					
 				}
-				//console.log(v);
-				if (current_q<questions.length) {
-					questions[current_q]["val"]=v;
-				}
+
 				loadnextvasq();
 			});
 
-			function loadnextvasq(){
-				var i=++current_q;
-				if (i<questions.length){
-					loadvasq(questions[i]["qtext"],questions[i]["qtext2"],questions[i]["label1"],questions[i]["label2"]);
-				} else {
+			function loadnextvasq()
+			{
+				//console.log("current_q:",current_q)
+				var i = ++current_q;
+
+				if( i == -1 )
+				{
+					is_question = false;
+					loadscreen(first_screen)
+				}
+				else if ( i < 2 )
+				{
+					is_question = true;
+					// load test question
+					loadvasq(questions[i]["qtext"],  questions[i]["qtext2"],
+						 	 questions[i]["label1"], questions[i]["label2"]);
+				}
+				else if ( i == 2 )
+				{
+					is_question = false;
+					loadscreen(second_screen)
+				}				
+				else if ( i < questions.length )
+				{
+					is_question = true;
+					// load a real question
+					loadvasq(questions[i]["qtext"],  questions[i]["qtext2"],
+							 questions[i]["label1"], questions[i]["label2"]);
+				}
+				else if ( i == questions.length )
+				{
+					// we still need to measure the personality traits
+
+					is_question = false;
+					loadscreen(pre_personality_screen)
+				}
+				else if ( i == (questions.length+1) )
+				{
+					is_question = false
+					loadscreen(thankyou_screen)
+				}
+				else
+				{
+					loadscreen(final_screen)
 					console.log(questions); 
 					//TODO: Save questions to server with unique user id.
-					//TODO: Send to post-experiment questionaire
+					//TODO: Send to post-experiment questionaire					
 				}
 
 			}
 
-			function loadvasq(qtext,qtext2,label1="Strongly agree",label2="Strongly disagree",social_info="") {
+			function loadscreen(screen)
+			{
+				$("#qtext").text(screen["qtext"]);
+				$("#qtext2").text(screen["qtext2"]);
+				//$("#paragraph").text("");
+				$(".vas").hide();
+				$("#next").text("Continue");
+
+				if( screen["qtext2"] == "Thank you for participating")
+					$("#next").text("Submit");
+				else if( screen["qtext2"] == "You can close this page now.")
+					$("#next").hide();
+
+
+					//$("#next").hide();
+			}
+
+			function loadvasq(qtext,qtext2,label1="Strongly agree",label2="Strongly disagree",social_info="")
+			{
 				$("#qtext").text(qtext);
 				$("#qtext2").text(qtext2);
+				$("#paragraph").hide();
+				$(".vas").show();
 				$("#label1").text(label1);
 				$("#label2").text(label2);
 				$(".vas-dot").hide();
+				$("#next").text("Next");
+
 				//TODO: Social info
 			}
 
-			function shuffle(array) {
+			function shuffle(array)
+			{
 				var currentIndex = array.length, temporaryValue, randomIndex;
 
 				// While there remain elements to shuffle...
-				while (0 !== currentIndex) {
+				while (0 !== currentIndex)
+				{
 
 					// Pick a remaining element...
 					randomIndex = Math.floor(Math.random() * currentIndex);
@@ -83,21 +159,62 @@
 				
 				var questions=[];
 				var id=0;
+
+				// First, the test question
+				test_question_text = "We need some text for the test question"
+
+				questions.push({id:id++, qtext:test_question_text,
+					qtext2:"How much do you agree with the following?",
+					label1:"Strongly agree",label2:"Strongly disagree"})
+
+				questions.push({id:id++, qtext:test_question_text,
+					qtext2:"How important is this issue to the UK?",
+					label1:"Very important", label2:"Not important at all"});
+
+
 				for (var i=0; i<raw_qs.length; i++)
 				{
 					var q=raw_qs[i];
-					questions.push({id:id++, qtext:q, qtext2:"How much do you agree with the following?", label1:"Strongly agree",label2:"Strongly disagree"});
-					questions.push({id:id++, qtext:q, qtext2:"How important is this issue to the UK?", label1:"Very important", label2:"Not important at all"});
+
+					questions.push({id:id++, qtext:q,
+									qtext2:"How much do you agree with the following?",
+									label1:"Strongly agree",label2:"Strongly disagree"});
+					
+					questions.push({id:id++, qtext:q,
+									qtext2:"How important is this issue to the UK?", 
+									label1:"Very important",
+									label2:"Not important at all"});
 				}
+
 				//This question is always last
-				questions.push({id:questions.length, qtext:"Leaving the EU will be positive for the United Kingdom", qtext2:"How much do you agree with the following?", label1:"Strongly agree",label2:"Strongly disagree"})
-				questions.push({id:questions.length, qtext:"Leaving the EU will be positive for the United Kingdom", qtext2:"How important is this issue to the UK?", label1:"Very important", label2:"Not important at all"});
+				
+				questions.push({id:questions.length,
+					qtext:"Leaving the EU will be positive for the United Kingdom",
+					qtext2:"How much do you agree with the following?",
+					label1:"Strongly agree",label2:"Strongly disagree"})
+
+				questions.push({id:questions.length,
+					qtext:"Leaving the EU will be positive for the United Kingdom",
+					qtext2:"How important is this issue to the UK?",
+					label1:"Very important", label2:"Not important at all"});
+
 				return questions;
 				//TODO: Fix so that "id" property is constant and not shuffled
 			}
-			var current_q=-1; //start at -1 
 
+
+			var current_q=-2;
 			var questions=init();
+
+			var is_question;
+			var first_screen = { qtext:"", qtext2:"Welcome!"}
+			var second_screen = { qtext:"Now that the practice questions are done, let's do the real questions.", qtext2:"Ready!"}
+
+			var pre_personality_screen = { qtext:"Personality questions.", qtext2:"Next"}
+			var thankyou_screen = { qtext:"(thank you screen)",
+									qtext2:"Thank you for participating"}
+			var final_screen = { qtext: "", qtext2:"You can close this page now."}
+
 			loadnextvasq();
 
 		});
@@ -108,8 +225,20 @@
 	</head>
 	<body>
 		
-		<h1 id="qtext2">How strongly do you agree?</h1>
-		<h2 id="qtext">This is awesome</h2>
+		<h1 id="qtext2" > Welcome!</h1>
+
+		<p id="paragraph">We are researchers from the University of Oxford and King's College London seeking to understand people's opinion on social and political issues.
+		<br><br>
+		If you want to participate, we will be asking your opinion on a series of social and political issues on two sessions (two consecutive days), each taking 10-15 minutes. As you complete the second session, you will earn <b>&pound;X</b> in Amazon vouchers.
+		<br><br>
+		You are not obliged to take part in the study and you can later decide to withdraw from the study up to one month after participating by contacting the researchers.
+		<br><br>
+		Before you agree to participate, you can read all the necessary information about the nature of the study, including usage and protection of your data, <a href="https://www.example.com"><u>here</u></a>. 
+		<br><br>
+		Please click if you agree to participate.</p>
+
+		<!--<h1 id="qtext2">How strongly do you agree?</h1>-->
+		<h2 id="qtext">Placeholder question text</h2>
 
 		<div class="vas">
 			<div class="vas-label" id="label1">Strongly agree</div>
@@ -121,7 +250,7 @@
 			<div class="vas-label" id="label2">Strongly disagree</div>
 		</div>
 
-		<div class="next"><a href="javascript:void(0);">Next</a></div>
+		<div class="next" id="next"><a href="javascript:void(0);">Continue</a></div>
 
 	</body>
 </html>

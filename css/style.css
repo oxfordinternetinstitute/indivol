@@ -1,7 +1,7 @@
 @import url(https://fonts.googleapis.com/css?family=Work+Sans:300,600);
 
 h1 {
-	margin: 10px;
+	margin: 5px;
 	font-family: 'Work Sans', sans-serif;
 	text-align: center;
 	font-size: 180%;
@@ -9,7 +9,7 @@ h1 {
 }
 
 h2 {
-	margin: 10px;
+	margin: 5px;
 	font-family: 'Work Sans', sans-serif;
 	text-align: center;
 	font-size: 150%;
@@ -26,6 +26,15 @@ h3 {
 	padding: 5px;
 }
 
+p {
+	margin: 10px;
+	font-family: 'Work Sans', sans-serif;
+	text-align: left;
+	font-size: 115%;
+	font-weight: 200;
+	line-height:1.25;
+	padding: 5px;
+}
 
 .next {
 	color: white;
@@ -35,6 +44,7 @@ h3 {
 	float: right;
 	margin-right: 10%;
 	margin-top: 5px;
+	margin-bottom: 15px;
 	width: 100px;
 	text-align: center;
 	background-color: #279;
