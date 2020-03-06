@@ -2,9 +2,9 @@
 
 .vas-scale {
 	position: relative;
-	width: 30px;
+	width: 5px;
 	margin: 5px auto;
-	height: 80%;
+	height: 90%;
 	cursor:pointer;
 }
 
@@ -19,6 +19,7 @@
 	background-color: #000;
 	z-index:0;
 }
+
 .vas-label {
 	font-family: 'Work Sans', sans-serif;
 	font-weight: 400;
@@ -29,9 +30,23 @@
 	margin: 0 auto;
 
 }
+
 .vas {
+	position: absolute;
+  	bottom: 0;
+  	left: 0;
+  	/* height:50%; for iPhone 5 */
+  	height:60%; 
+  	width:100%;
+  	margin-bottom: 60px;
+}
+
+.vas-content {
+	position: relative;
 	margin: 5px auto;
-	height: 50%; 
+	/*height: 87%; for iPhone 5*/
+	height: 90%; 
+	width:100%;
 	clear: both;
 }
 

@@ -6,7 +6,8 @@
 		$(function(){
 			$(".vas-scale").click(function(e)
 			{
-				var posX = $(this).offset().left, posY = $(this).offset().top;
+				var posX = $(this).offset().left;
+				var posY = $(this).offset().top;
 				var val=e.pageY - posY;
 				//console.log(val);
 				$(this).children("input").val(val);
@@ -16,67 +17,97 @@
 			$(".next").click(function(e)
 			{
 				//if (false) // for debugging
-				if( is_question ) 
+				if( current_is_question ) 
 				{
 					var v=$("#vas_value").val();
-					//console.log("vas_value =", v)
-
-					if( (v=="NA"))
+					/*if( v == "NA")
 					{
 						return false;
-					}
-					if (current_q<questions.length)
+					}*/
+					if( current_q == 0 ) // first test question
 					{
-						questions[current_q]["val"]=v;
+						if( v > 20 )
+							return false;
+						else
+							$("#vas_value").val("NA")
+					}
+					else if( current_q == 1 ) // second test question
+					{
+						if( v < 335 )
+							return false;
+						else
+							$("#vas_value").val("NA")
+					}					
+					else if (current_q < (questions.length+2))
+					{
+						var idx = current_q;
+
+						questions[idx]["val"]=v;
+						questions[idx]["reaction_time"]=time_end();
+
+						console.log("Question index", idx)
+						console.log(questions[idx]['qtext'], v)
 
 						// Reset value (for some reason it requires that)
 						$("#vas_value").val("NA")
-					}					
+					}
 				}
 
+				timeDiff = time_end();
+				time_start();
 				loadnextvasq();
 			});
 
 			function loadnextvasq()
 			{
-				//console.log("current_q:",current_q)
+				console.log("current_q:",current_q+1)
 				var i = ++current_q;
 
 				if( i == -1 )
 				{
-					is_question = false;
+					console.log("i==-1")
+					next_is_question = false;
 					loadscreen(first_screen)
+					current_is_question = false;
 				}
 				else if ( i < 2 )
 				{
-					is_question = true;
+					console.log("i<2")
+					next_is_question = true;
 					// load test question
 					loadvasq(questions[i]["qtext"],  questions[i]["qtext2"],
 						 	 questions[i]["label1"], questions[i]["label2"]);
+					current_is_question = false;
 				}
 				else if ( i == 2 )
 				{
-					is_question = false;
+					console.log("i==2")
+					next_is_question = false;
+					console.log("loading second screen now")
 					loadscreen(second_screen)
+					current_is_question = false;
 				}				
 				else if ( i < questions.length )
 				{
-					is_question = true;
+					next_is_question = true;
 					// load a real question
 					loadvasq(questions[i]["qtext"],  questions[i]["qtext2"],
 							 questions[i]["label1"], questions[i]["label2"]);
+					current_is_question = true;
 				}
 				else if ( i == questions.length )
 				{
 					// we still need to measure the personality traits
 
-					is_question = false;
+					next_is_question = false;
 					loadscreen(pre_personality_screen)
+					current_is_question = false;
 				}
 				else if ( i == (questions.length+1) )
 				{
-					is_question = false
+					next_is_question = false
 					loadscreen(thankyou_screen)
+					current_is_question = false;
 				}
 				else
 				{
@@ -95,14 +126,12 @@
 				//$("#paragraph").text("");
 				$(".vas").hide();
 				$("#next").text("Continue");
+				$("#next").css({ position: "relative"}).appendTo('body');
 
 				if( screen["qtext2"] == "Thank you for participating")
 					$("#next").text("Submit");
 				else if( screen["qtext2"] == "You can close this page now.")
 					$("#next").hide();
-
-
-					//$("#next").hide();
 			}
 
 			function loadvasq(qtext,qtext2,label1="Strongly agree",label2="Strongly disagree",social_info="")
@@ -115,6 +144,8 @@
 				$("#label2").text(label2);
 				$(".vas-dot").hide();
 				$("#next").text("Next");
+				$("#next").css({ position: "absolute", right:'7'}).appendTo('body');
+				//$("#next").hide();
 
 				//TODO: Social info
 			}
@@ -160,16 +191,14 @@
 				var questions=[];
 				var id=0;
 
-				// First, the test question
-				test_question_text = "We need some text for the test question"
-
-				questions.push({id:id++, qtext:test_question_text,
+				// First, the test questions
+				questions.push({id:id++, qtext:"For this question, please mark Strongly agree",
 					qtext2:"How much do you agree with the following?",
-					label1:"Strongly agree",label2:"Strongly disagree"})
+					label1:"Strongly agree",label2:"Strongly disagree"});
 
-				questions.push({id:id++, qtext:test_question_text,
-					qtext2:"How important is this issue to the UK?",
-					label1:"Very important", label2:"Not important at all"});
+				questions.push({id:id++, qtext:"For this question, please mark Strongly disagree",
+					qtext2:"How much do you agree with the following?",
+					label1:"Strongly agree",label2:"Strongly disagree"});
 
 
 				for (var i=0; i<raw_qs.length; i++)
@@ -179,11 +208,6 @@
 					questions.push({id:id++, qtext:q,
 									qtext2:"How much do you agree with the following?",
 									label1:"Strongly agree",label2:"Strongly disagree"});
-					
-					questions.push({id:id++, qtext:q,
-									qtext2:"How important is this issue to the UK?", 
-									label1:"Very important",
-									label2:"Not important at all"});
 				}
 
 				//This question is always last
@@ -193,20 +217,20 @@
 					qtext2:"How much do you agree with the following?",
 					label1:"Strongly agree",label2:"Strongly disagree"})
 
-				questions.push({id:questions.length,
-					qtext:"Leaving the EU will be positive for the United Kingdom",
-					qtext2:"How important is this issue to the UK?",
-					label1:"Very important", label2:"Not important at all"});
+				//questions.push({id:questions.length,
+				//	qtext:"Leaving the EU will be positive for the United Kingdom",
+				//	qtext2:"How important is this issue to the UK?",
+				//	label1:"Very important", label2:"Not important at all"});
 
 				return questions;
 				//TODO: Fix so that "id" property is constant and not shuffled
 			}
 
 
-			var current_q=-2;
-			var questions=init();
+			var current_q = -2;
+			var questions = init();
 
-			var is_question;
+			var next_is_question, current_is_question;
 			var first_screen = { qtext:"", qtext2:"Welcome!"}
 			var second_screen = { qtext:"Now that the practice questions are done, let's do the real questions.", qtext2:"Ready!"}
 
@@ -218,6 +242,32 @@
 			loadnextvasq();
 
 		});
+
+
+		// count time
+		var startTime, endTime;
+
+		function time_start()
+		{
+		  startTime = new Date();
+		};
+
+		function time_end()
+		{
+		  endTime = new Date();
+		  var timeDiff = endTime - startTime; //in ms
+		  // strip the ms
+		  //timeDiff /= 1000;
+
+		  // get seconds 
+		  //var seconds = Math.round(timeDiff);
+
+		  // output
+		  //console.log(timeDiff + " ms");
+
+		  return timeDiff;
+		}
+
 		</script>
 
 	<link rel="stylesheet" href="css/vas.css" type="text/css" media="screen" />
@@ -237,17 +287,18 @@
 		<br><br>
 		Please click if you agree to participate.</p>
 
-		<!--<h1 id="qtext2">How strongly do you agree?</h1>-->
 		<h2 id="qtext">Placeholder question text</h2>
 
 		<div class="vas">
+			<div class="vas-content">
 			<div class="vas-label" id="label1">Strongly agree</div>
 			<div class="vas-scale">
 				<div class="vas-line"></div>
-				<div class="vas-dot"></div>
+				<div class="vas-dot" draggable="true"></div>
 				<input type="hidden" id="vas_value" name="vas_value" value="NA">
 			</div>
 			<div class="vas-label" id="label2">Strongly disagree</div>
+			</div>
 		</div>
 
 		<div class="next" id="next"><a href="javascript:void(0);">Continue</a></div>
