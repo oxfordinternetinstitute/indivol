@@ -17,40 +17,53 @@
 			$(".next").click(function(e)
 			{
 				//if (false) // for debugging
-				if( current_is_question ) 
+				if( is_question ) 
 				{
 					var v=$("#vas_value").val();
 					/*if( v == "NA")
 					{
 						return false;
 					}*/
-					if( current_q == 0 ) // first test question
+					if( idx_test_q == 0 ) // first test question
 					{
 						if( v > 20 )
 							return false;
 						else
 							$("#vas_value").val("NA")
 					}
-					else if( current_q == 1 ) // second test question
+					else if( idx_test_q == 1 ) // second test question
 					{
 						if( v < 335 )
 							return false;
 						else
 							$("#vas_value").val("NA")
 					}					
-					else if (current_q < (questions.length+2))
+					else if (  idx_survey_q < len_survey )
 					{
-						var idx = current_q;
+						var idx = idx_survey_q;
 
-						questions[idx]["val"]=v;
-						questions[idx]["reaction_time"]=time_end();
+						questions_survey[idx]["val"]=v;
+						questions_survey[idx]["reaction_time"]=time_end();
 
-						console.log("Question index", idx)
-						console.log(questions[idx]['qtext'], v)
+						console.log("Survey question index", idx)
+						console.log(questions_survey[idx]['qtext'], v)
 
 						// Reset value (for some reason it requires that)
 						$("#vas_value").val("NA")
 					}
+					else if (  idx_personality_q < len_personality )
+					{
+						var idx = idx_personality_q;
+
+						questions_personality[idx]["val"]=v;
+						questions_personality[idx]["reaction_time"]=time_end();
+
+						console.log("Personality question index", idx)
+						console.log(questions_personality[idx]['qtext'], v)
+
+						// Reset value (for some reason it requires that)
+						$("#vas_value").val("NA")
+					}					
 				}
 
 				timeDiff = time_end();
@@ -60,67 +73,75 @@
 
 			function loadnextvasq()
 			{
-				console.log("current_q:",current_q+1)
-				var i = ++current_q;
+				idx_test_q        = current_screen-1;
+				idx_survey_q      = current_screen-len_test-2;
+				idx_personality_q = current_screen-len_survey-len_test-3;
+				//console.log(idx_test_q, idx_survey_q, idx_personality_q, current_screen)
 
-				if( i == -1 )
+				if( current_screen == -1 )
 				{
-					console.log("i==-1")
-					next_is_question = false;
 					loadscreen(first_screen)
-					current_is_question = false;
 				}
-				else if ( i < 2 )
+				else if ( current_screen == 0 )
 				{
-					console.log("i<2")
-					next_is_question = true;
-					// load test question
-					loadvasq(questions[i]["qtext"],  questions[i]["qtext2"],
-						 	 questions[i]["label1"], questions[i]["label2"]);
-					current_is_question = false;
-				}
-				else if ( i == 2 )
-				{
-					console.log("i==2")
-					next_is_question = false;
-					console.log("loading second screen now")
-					loadscreen(second_screen)
-					current_is_question = false;
+					console.log("loading pre test screen now")
+					loadscreen(pre_test_screen)
 				}				
-				else if ( i < questions.length )
+				else if ( current_screen < ( 1 + len_test ) )
 				{
-					next_is_question = true;
-					// load a real question
-					loadvasq(questions[i]["qtext"],  questions[i]["qtext2"],
-							 questions[i]["label1"], questions[i]["label2"]);
-					current_is_question = true;
+					// load test question
+					loadvasq(questions_test[idx_test_q]["qtext"],
+							 questions_test[idx_test_q]["qtext2"],
+							 questions_test[idx_test_q]["label1"],
+							 questions_test[idx_test_q]["label2"]);
 				}
-				else if ( i == questions.length )
+				else if ( current_screen == ( 1 + len_test ) )
+				{
+					console.log("loading pre survey screen now")
+					loadscreen(pre_survey_screen)
+				}				
+				else if ( current_screen < (2 + len_test + len_survey) )
+				{
+					// load a question from the survey
+					
+					loadvasq(questions_survey[idx_survey_q]["qtext"],
+							 questions_survey[idx_survey_q]["qtext2"],
+							 questions_survey[idx_survey_q]["label1"],
+							 questions_survey[idx_survey_q]["label2"]);
+				}
+				else if ( current_screen == (2 + len_test + len_survey) )
 				{
 					// we still need to measure the personality traits
-
-					next_is_question = false;
 					loadscreen(pre_personality_screen)
-					current_is_question = false;
 				}
-				else if ( i == (questions.length+1) )
+				else if ( current_screen < (2 + len_test + len_survey + len_personality) )
 				{
-					next_is_question = false
+					// load a personality question
+					loadvasq(questions_personality[idx_personality_q]["qtext"],
+							 questions_personality[idx_personality_q]["qtext2"],
+							 questions_personality[idx_personality_q]["label1"],
+							 questions_personality[idx_personality_q]["label2"]);
+				}				
+				else if ( current_screen == (2 + len_test + len_survey + len_personality) )
+				{
 					loadscreen(thankyou_screen)
-					current_is_question = false;
 				}
 				else
 				{
 					loadscreen(final_screen)
-					console.log(questions); 
+					console.log(questions_survey); 
+					console.log(questions_personality); 
 					//TODO: Save questions to server with unique user id.
 					//TODO: Send to post-experiment questionaire					
 				}
+				current_screen++;
+				//console.log("now current_screen =",current_screen)
 
 			}
 
 			function loadscreen(screen)
 			{
+				is_question = false;
 				$("#qtext").text(screen["qtext"]);
 				$("#qtext2").text(screen["qtext2"]);
 				//$("#paragraph").text("");
@@ -128,6 +149,8 @@
 				$("#next").text("Continue");
 				$("#next").css({ position: "relative"}).appendTo('body');
 
+				if( screen["qtext2"] == "Practice:")
+					$("#paragraph").hide();
 				if( screen["qtext2"] == "Thank you for participating")
 					$("#next").text("Submit");
 				else if( screen["qtext2"] == "You can close this page now.")
@@ -136,6 +159,7 @@
 
 			function loadvasq(qtext,qtext2,label1="Strongly agree",label2="Strongly disagree",social_info="")
 			{
+				is_question = true;
 				$("#qtext").text(qtext);
 				$("#qtext2").text(qtext2);
 				$("#paragraph").hide();
@@ -171,9 +195,25 @@
 				return array;
 			}
 
-			function init()
+			function init_questions_test()
 			{
-		
+				var questions=[];
+				var id=0;
+
+				// First, the test questions
+				questions.push({id:id++, qtext:"For this question, please mark Strongly agree",
+					qtext2:"How much do you agree with the following?",
+					label1:"Strongly agree",label2:"Strongly disagree"});
+
+				questions.push({id:id++, qtext:"For this question, please mark Strongly disagree",
+					qtext2:"How much do you agree with the following?",
+					label1:"Strongly agree",label2:"Strongly disagree"});
+
+				return questions;
+			}
+
+			function init_questions_survey()
+			{
 				var raw_qs=[
 					"The government should be doing more to tackle climate change",
 					"The government should take more steps to reduce social inequality",
@@ -190,16 +230,6 @@
 				
 				var questions=[];
 				var id=0;
-
-				// First, the test questions
-				questions.push({id:id++, qtext:"For this question, please mark Strongly agree",
-					qtext2:"How much do you agree with the following?",
-					label1:"Strongly agree",label2:"Strongly disagree"});
-
-				questions.push({id:id++, qtext:"For this question, please mark Strongly disagree",
-					qtext2:"How much do you agree with the following?",
-					label1:"Strongly agree",label2:"Strongly disagree"});
-
 
 				for (var i=0; i<raw_qs.length; i++)
 				{
@@ -226,16 +256,52 @@
 				//TODO: Fix so that "id" property is constant and not shuffled
 			}
 
+			function init_questions_personality()
+			{
+				var raw_qs=[
+					"extraverted, enthusiastic",
+					"critical, quarrelsome",
+					"dependable, self-disciplined",
+					"anxious, easily upset",
+					"open to new experiences, complex",
+					"reserved, quiet",
+					"sympathetic, warm",
+					"disorganized, careless",
+					"calm, emotionally stable",
+					"conventional, uncreative"
+				];
 
-			var current_q = -2;
-			var questions = init();
+				var questions=[];
+				var id=0;
 
-			var next_is_question, current_is_question;
+				for (var i=0; i<raw_qs.length; i++)
+				{
+					var q=raw_qs[i];
+
+					questions.push({id:id++, qtext:"I see myself as "+q,
+									qtext2:"How much do you agree with the following?",
+									label1:"Strongly agree",label2:"Strongly disagree"});
+				}
+
+				return questions;
+			}
+
+			var is_question;
+			var idx_test_q, idx_survey_q, idx_personality_q;
+			var questions_test        = init_questions_test();
+			var questions_survey      = init_questions_survey();
+			var questions_personality = init_questions_personality();
+			var len_test              = questions_test.length;
+			var len_survey            = questions_survey.length;
+			var len_personality       = questions_personality.length;
+
+			var current_screen = -1;
+
 			var first_screen = { qtext:"", qtext2:"Welcome!"}
-			var second_screen = { qtext:"Now that the practice questions are done, let's do the real questions.", qtext2:"Ready!"}
-
+			var pre_test_screen = { qtext:"Let's first practice with two test questions.", qtext2:"Practice:"}
+			var pre_survey_screen = { qtext:"Now that the practice questions are done, let's do the real questions.", qtext2:"Ready!"}
 			var pre_personality_screen = { qtext:"Personality questions.", qtext2:"Next"}
-			var thankyou_screen = { qtext:"(thank you screen)",
+			var thankyou_screen = { qtext:"To participate in the next session and receive your Amazon voucher please enter your email below (...) We will use your email for no other purposes other than to contact you in regard to this survey and will delete it after you participate or after 90 days, whichever comes first.",
 									qtext2:"Thank you for participating"}
 			var final_screen = { qtext: "", qtext2:"You can close this page now."}
 
