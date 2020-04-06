@@ -4,12 +4,11 @@
 		<script src="js/jquery-3.4.1.js"></script>
 		<script language="javascript">
 		$(function(){
-			$(".vas-scale").click(function(e)
-			{
-				var posX = $(this).offset().left;
+			$(".vas-scale").on('mousedown', function(e) {
+				$(this).children(".vas-dot").hide();
+			}).on('mouseup', function(e) {
 				var posY = $(this).offset().top;
 				var val=e.pageY - posY;
-				//console.log(val);
 				$(this).children("input").val(val);
 				$(this).children(".vas-dot").show().css({"margin-top":val-8});
 			});
