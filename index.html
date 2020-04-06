@@ -4,13 +4,37 @@
 		<script src="js/jquery-3.4.1.js"></script>
 		<script language="javascript">
 		$(function(){
-			$(".vas-scale").on('mousedown', function(e) {
+			/*$(".vas-scale").on('mousedown', function(e) {
 				$(this).children(".vas-dot").hide();
 			}).on('mouseup', function(e) {
 				var posY = $(this).offset().top;
 				var val=e.pageY - posY;
 				$(this).children("input").val(val);
 				$(this).children(".vas-dot").show().css({"margin-top":val-8});
+			});*/
+			$(".vas-scale").on('mouseup',function(e) {
+				var posY = $(this).offset().top;
+				var val=e.pageY - posY;
+				$(this).children("input").val(val);
+				$(this).children(".vas-dot").show().css({"margin-top":val-8});
+				//console.log("val: "+val);
+			});
+			//See https://www.sanwebe.com/2014/10/draggable-element-with-jquery-no-jquery-ui
+			$(".vas-dot").on('mousedown',function(e){
+				var dot=$(this).addClass("drag").css("cursor","move");
+				var scale = $(this).parent();
+				var posY=scale.offset().top;
+				var val=e.pageY-posY;
+				$(document.body).on('mousemove', function(e){
+				//scale.on('mousemove', function(e){
+					if(dot.hasClass("drag")){
+						var val2=Math.min(scale.height(),Math.max(0,e.pageY-posY));
+						dot.css({"margin-top":val2-8});
+						$(this).siblings("input").val(val2); //might below in mouseup
+					}
+				}).on('mouseup',function(e) {
+					dot.removeClass("drag");
+				});
 			});
 
 			$(".next").click(function(e)
