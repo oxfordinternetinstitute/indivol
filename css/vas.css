@@ -2,7 +2,7 @@
 
 .vas-scale {
 	position: relative;
-	width: 5px;
+	width: 51px;
 	margin: 5px auto;
 	height: 90%;
 	cursor:pointer;
@@ -14,7 +14,7 @@
 	top: 0px;
 	width: 2px;
 	margin-top: 0px;
-	margin-left: 7px;
+	margin-left: 25px;
 	height: 100%;
 	background-color: #000;
 	z-index:0;
@@ -53,7 +53,7 @@
 .vas-dot {
 	z-index:1;
 	position: absolute;
-	left: 0px;
+	left: 18px;
 	top:0px;
 	display: none;
 	width: 16px;
