@@ -2,6 +2,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<head>
 		<script src="js/jquery-3.4.1.js"></script>
+		<link  href = "https://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css" rel = "stylesheet">
+		<script src = "https://code.jquery.com/jquery-1.10.2.js"></script>
+		<script src = "https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+
+		<script src="js/jquery.ui.touch-punch.min.js"></script>
+
 		<script language="javascript">
 		$(function(){
 			$(".vas-scale").on('mousedown', function(e) {
@@ -119,10 +125,15 @@
 				}
 				else if ( current_screen == (2 + len_test + len_survey) )
 				{
+					// load ranking question
+					loadscreen(ranking_screen)
+				}
+				else if ( current_screen == (3 + len_test + len_survey) )
+				{
 					// we still need to measure the personality traits
 					loadscreen(pre_personality_screen)
-				}
-				else if ( current_screen < (2 + len_test + len_survey + len_personality) )
+				}				
+				else if ( current_screen < (3 + len_test + len_survey + len_personality) )
 				{
 					// load a personality question
 					loadvasq(questions_personality[idx_personality_q]["qtext"],
@@ -130,7 +141,7 @@
 							 questions_personality[idx_personality_q]["label1"],
 							 questions_personality[idx_personality_q]["label2"]);
 				}				
-				else if ( current_screen == (2 + len_test + len_survey + len_personality) )
+				else if ( current_screen == (3 + len_test + len_survey + len_personality) )
 				{
 					loadscreen(thankyou_screen)
 				}
@@ -164,6 +175,18 @@
 					$("#next").text("Submit");
 				else if( screen["qtext2"] == "You can close this page now.")
 					$("#next").hide();
+
+				if( screen["qtext"] == "Ranking questions.")
+				{
+					$("#next").css({ position: "absolute", right:'7'}).appendTo('body');
+					$(".draggablesquare").show();
+					$("#ruler").show()
+				}
+				else
+				{
+					$(".draggablesquare").hide();
+					$("#ruler").hide()
+				}
 			}
 
 			function loadvasq(qtext,qtext2,label1="Strongly agree",label2="Strongly disagree",social_info="")
@@ -181,7 +204,8 @@
 				$("#back").show();
 				$("#back").text("Back");
 				$("#back").css({ position: "absolute", left:'27'}).appendTo('body');
-				//$("#next").hide();
+
+				$(".draggablesquare").hide();
 
 				//TODO: Social info
 			}
@@ -312,12 +336,66 @@
 			var first_screen = { qtext:"", qtext2:"Welcome!"}
 			var pre_test_screen = { qtext:"Let's first practice with two test questions.", qtext2:"Practice:"}
 			var pre_survey_screen = { qtext:"Now that the practice questions are done, let's do the real questions.", qtext2:"Ready!"}
+			var ranking_screen = { qtext:"Ranking questions.", qtext2:"Next"}
 			var pre_personality_screen = { qtext:"Personality questions.", qtext2:"Next"}
 			var thankyou_screen = { qtext:"To participate in the next session and receive your Amazon voucher please enter your email below (...) We will use your email for no other purposes other than to contact you in regard to this survey and will delete it after you participate or after 90 days, whichever comes first.",
 									qtext2:"Thank you for participating"}
 			var final_screen = { qtext: "", qtext2:"You can close this page now."}
 
 			loadnextvasq();
+
+
+
+		function addSquare (currentDiv, content, xposition, yposition) { 
+		  // create a new div element 
+		  var newDiv = document.createElement("div"); 
+		  // and give it some content 
+		  var newContent = document.createTextNode(content); 
+		  // add the text node to the newly created div
+		  newDiv.appendChild(newContent); 
+
+	  	  // set a class
+		  newDiv.setAttribute('class', 'draggablesquare');
+		  newDiv.style.left = xposition+'px'
+		  newDiv.style.top  = yposition+'px'
+
+		  document.body.insertBefore(newDiv, currentDiv); 
+		  return newDiv;
+		}
+
+		function addNsquares()
+		{
+			// add the newly created element and its content into the DOM 
+			var currentDiv = document.getElementById("next"); 
+			for(var j=0; j<10; j++)
+			{
+				xposition = 20  + (j - j%5)*15;
+				yposition = 250 + 50*(j%5);
+				currentDiv = addSquare(currentDiv, "Issue "+j, xposition, yposition);
+			}
+
+			// add line
+			var newDiv = document.createElement("div"); 
+  		    // set a class
+			newDiv.setAttribute('class', 'vas-line');
+			newDiv.setAttribute('id', 'ruler');
+			newDiv.style.left = '300px'
+			newDiv.style.top  = '150px'
+			newDiv.style.height  = '500px'
+			document.body.insertBefore(newDiv, currentDiv); 
+		}
+
+		// load and hide draggable squares
+		document.body.onload = function(){
+			// add draggable elements
+			addNsquares(10);
+			$(".draggablesquare").draggable();
+			$(".draggablesquare").hide();  
+			$("#ruler").hide()
+		}
+
+		
+		//$(".draggablesquare").draggable("enable");
 
 		});
 
@@ -350,6 +428,7 @@
 
 	<link rel="stylesheet" href="css/vas.css" type="text/css" media="screen" />
 	<link rel="stylesheet" href="css/style.css" type="text/css" media="screen" />
+	<link rel="stylesheet" href="css/draggable.css" type="text/css" media="screen" />
 	</head>
 	<body>
 		
