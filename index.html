@@ -15,54 +15,63 @@
 
 			$(".next").click(function(e)
 			{
-				//if( is_question ) 
-				if (false) // for debugging
+
+				// Check if the user is pressing the Back button
+				if( $(this).attr('id') == 'back' )
 				{
-					var v=$("#vas_value").val();
-					/*if( v == "NA")
+					current_screen = current_screen - 2;
+				}
+				else // the "else" condition is the Next button
+				{
+					//if( is_question ) // actual line, not for debugging
+					if (false) // for debugging
 					{
-						return false;
-					}*/
-					if( idx_test_q == 0 ) // first test question
-					{
-						if( v > 20 )
+						var v=$("#vas_value").val();
+						/*if( v == "NA")
+						{
 							return false;
-						else
+						}*/
+						if( idx_test_q == 0 ) // first test question
+						{
+							if( v > 20 )
+								return false;
+							else
+								$("#vas_value").val("NA")
+						}
+						else if( idx_test_q == 1 ) // second test question
+						{
+							if( v < 335 )
+								return false;
+							else
+								$("#vas_value").val("NA")
+						}					
+						else if (  idx_survey_q < len_survey )
+						{
+							var idx = idx_survey_q;
+
+							questions_survey[idx]["val"]=v;
+							questions_survey[idx]["reaction_time"]=time_end();
+
+							console.log("Survey question index", idx)
+							console.log(questions_survey[idx]['qtext'], v)
+
+							// Reset value (for some reason it requires that)
 							$("#vas_value").val("NA")
-					}
-					else if( idx_test_q == 1 ) // second test question
-					{
-						if( v < 335 )
-							return false;
-						else
+						}
+						else if (  idx_personality_q < len_personality )
+						{
+							var idx = idx_personality_q;
+
+							questions_personality[idx]["val"]=v;
+							questions_personality[idx]["reaction_time"]=time_end();
+
+							console.log("Personality question index", idx)
+							console.log(questions_personality[idx]['qtext'], v)
+
+							// Reset value (for some reason it requires that)
 							$("#vas_value").val("NA")
-					}					
-					else if (  idx_survey_q < len_survey )
-					{
-						var idx = idx_survey_q;
-
-						questions_survey[idx]["val"]=v;
-						questions_survey[idx]["reaction_time"]=time_end();
-
-						console.log("Survey question index", idx)
-						console.log(questions_survey[idx]['qtext'], v)
-
-						// Reset value (for some reason it requires that)
-						$("#vas_value").val("NA")
-					}
-					else if (  idx_personality_q < len_personality )
-					{
-						var idx = idx_personality_q;
-
-						questions_personality[idx]["val"]=v;
-						questions_personality[idx]["reaction_time"]=time_end();
-
-						console.log("Personality question index", idx)
-						console.log(questions_personality[idx]['qtext'], v)
-
-						// Reset value (for some reason it requires that)
-						$("#vas_value").val("NA")
-					}					
+						}					
+					}		
 				}
 
 				timeDiff = time_end();
@@ -147,6 +156,7 @@
 				$(".vas").hide();
 				$("#next").text("Continue");
 				$("#next").css({ position: "relative"}).appendTo('body');
+				$("#back").hide();
 
 				if( screen["qtext2"] == "Practice:")
 					$("#paragraph").hide();
@@ -168,6 +178,9 @@
 				$(".vas-dot").hide();
 				$("#next").text("Next");
 				$("#next").css({ position: "absolute", right:'7'}).appendTo('body');
+				$("#back").show();
+				$("#back").text("Back");
+				$("#back").css({ position: "absolute", left:'27'}).appendTo('body');
 				//$("#next").hide();
 
 				//TODO: Social info
@@ -367,6 +380,7 @@
 		</div>
 
 		<div class="next" id="next"><a href="javascript:void(0);">Continue</a></div>
+		<div class="next" id="back"><a href="javascript:void(0);">Back</a></div>
 
 	</body>
 </html>
