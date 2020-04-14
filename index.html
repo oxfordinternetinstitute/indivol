@@ -130,6 +130,7 @@
 				}
 				else if ( current_screen == (3 + len_test + len_survey) )
 				{
+					save_rankings()
 					// we still need to measure the personality traits
 					loadscreen(pre_personality_screen)
 				}				
@@ -322,6 +323,23 @@
 				return questions;
 			}
 
+			function save_rankings()
+			{
+				console.log("Saving rankings now")
+				all_squares = $(".draggablesquare");
+
+				var ypositions = []
+
+				for (var i=0; i<all_squares.length; i++)
+				{
+					issue     = all_squares[i].innerText;
+					yposition = all_squares[i].style.top;
+
+					ypositions.push({ key:issue, value:yposition })
+				}
+				console.log(ypositions)
+			}
+
 			var is_question;
 			var idx_test_q, idx_survey_q, idx_personality_q;
 			var questions_test        = init_questions_test();
@@ -365,13 +383,21 @@
 
 		function addNsquares()
 		{
+
+			issue_names = ["Hate speech","Gender rights","Human rights","Immigration","Social inequality",
+						   "LGBTQ+ rights","NHS data","Climate change","False news","Brexit"];
+
 			// add the newly created element and its content into the DOM 
 			var currentDiv = document.getElementById("next"); 
 			for(var j=0; j<10; j++)
 			{
-				xposition = 20  + (j - j%5)*15;
-				yposition = 250 + 50*(j%5);
-				currentDiv = addSquare(currentDiv, "Issue "+j, xposition, yposition);
+				// One column
+				xposition = 20;
+				yposition = 150 + 50*j;
+				// Two columns
+				//xposition = 20  + (j - j%5)*15;
+				//yposition = 250 + 50*(j%5);
+				currentDiv = addSquare(currentDiv, issue_names[j], xposition, yposition);
 			}
 
 			// add line
@@ -388,14 +414,23 @@
 		// load and hide draggable squares
 		document.body.onload = function(){
 			// add draggable elements
-			addNsquares(10);
-			$(".draggablesquare").draggable();
+			minTopPosition = 135;
+			maxTopPosition	 = minTopPosition+490;
+			addNsquares();
+			$(".draggablesquare").draggable({
+				  //axis: "y",
+				  cursor: "move",
+				  drag: function(event, ui){
+				    var topPosition = ui.position.top;
+				    if (topPosition < minTopPosition)
+				    	{ ui.position.top = minTopPosition; }
+				    if (topPosition > maxTopPosition)
+				    	{ ui.position.top = maxTopPosition; }
+				  }
+				});
 			$(".draggablesquare").hide();  
 			$("#ruler").hide()
 		}
-
-		
-		//$(".draggablesquare").draggable("enable");
 
 		});
 
