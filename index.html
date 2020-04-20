@@ -29,8 +29,8 @@
 				}
 				else // the "else" condition is the Next button
 				{
-					//if( is_question ) // actual line, not for debugging
-					if (false) // for debugging
+					if( is_question ) // actual line, not for debugging
+					//if (false) // for debugging
 					{
 						var v=$("#vas_value").val();
 						/*if( v == "NA")
@@ -80,7 +80,13 @@
 					}		
 				}
 
-				timeDiff = time_end();
+				timeDiff  = time_end();
+
+				if( idx_survey_q < len_survey ) // if the user is answering the survey questions
+					save_questions(questions_survey); 
+				else // if the user has moved on to the personality questions
+					save_questions(questions_personality);
+
 				time_start();
 				loadnextvasq();
 			});
@@ -148,9 +154,7 @@
 				}
 				else
 				{
-					loadscreen(final_screen)
-					console.log(questions_survey); 
-					console.log(questions_personality); 
+					loadscreen(final_screen) 
 					//TODO: Save questions to server with unique user id.
 					//TODO: Send to post-experiment questionaire					
 				}
@@ -208,6 +212,7 @@
 				$("#back").text("Back");
 				$("#back").css({ position: "absolute", left:'27'}).appendTo('body');
 
+				/*
 				if( social_info != "" )
 				{
 					var bodyRect = document.body.getBoundingClientRect(),
@@ -216,6 +221,7 @@
 					$(".rectangle").css({ position: "absolute", top:social_info+offset}).appendTo('body');
 					$(".rectangle").show();
 				}
+				*/
 				$(".draggablesquare").hide();
 			}
 
@@ -257,7 +263,7 @@
 				return questions;
 			}
 
-			function init_questions_survey(include_social_info)
+			function init_questions_survey(include_social_info, user_id)
 			{
 				var raw_qs=[
 					"The government should be doing more to tackle climate change",
@@ -273,7 +279,7 @@
 				];
 				raw_qs=shuffle(raw_qs);
 				
-				var soc_infos = [50,75,100,125,150,175,200,225,250,275];
+				var soc_infos = get_socinfo_from_server(user_id);
 
 				var questions=[];
 				var id=0;
@@ -284,25 +290,41 @@
 
 					if( include_social_info )
 					{
-						questions.push({id:id++, qtext:"I see myself as "+q,
-										qtext2:"How much do you agree with the following?",
-										label1:"Strongly agree",label2:"Strongly disagree",
+						soc_info_text = "A recent poll shows "+soc_infos[i]+"% of British people agree with this statement:"
+						
+						questions.push({id:id++, qtext: q,
+										//qtext2:"How much do you agree with the following?",
+										qtext2:soc_info_text,
+										label1:"I strongly agree", label2:"I strongly disagree",
 										soc_info:soc_infos[i]});
 					}
 					else
 					{
-						questions.push({id:id++, qtext:"I see myself as "+q,
+						questions.push({id:id++, qtext:q,
 										qtext2:"How much do you agree with the following?",
-										label1:"Strongly agree",label2:"Strongly disagree"});
+										label1:"Strongly agree", label2:"Strongly disagree"});
 					}
 				}
 
 				//This question is always last
-				
-				questions.push({id:questions.length,
-					qtext:"Leaving the EU will be positive for the United Kingdom",
-					qtext2:"How much do you agree with the following?",
-					label1:"Strongly agree",label2:"Strongly disagree"})
+				if( include_social_info )
+				{
+					soc_info_text = "A recent poll shows "+soc_infos[i]+"% of British people agree with this statement:"
+					
+					questions.push({id:questions.length,
+						qtext:"Leaving the EU will be positive for the United Kingdom",
+						qtext2:soc_info_text,
+						label1:"I strongly agree", label2:"I strongly disagree",
+						soc_info:soc_infos[i]});
+				}
+				else
+				{
+					questions.push({id:questions.length,
+						qtext:"Leaving the EU will be positive for the United Kingdom",
+						qtext2:"How much do you agree with the following?",
+						label1:"Strongly agree",label2:"Strongly disagree"})
+				}				
+
 
 				return questions;
 				//TODO: Fix so that "id" property is constant and not shuffled
@@ -351,16 +373,42 @@
 
 					ypositions.push({ key:issue, value:yposition })
 				}
+
 				console.log(ypositions)
 			}
 
+
+			function save_questions(questions)
+			{
+				timestamp = new Date();
+				console.log("Saving questions:")			
+				console.log("User ID =",user_id);
+				console.log("Timestamp:", timestamp)
+				console.log(questions)
+			}
+
+			function get_socinfo_from_server(user_id)
+			{
+				console.log("Loading social information from server for user", user_id)
+
+				//var v = [50,75,100,125,150,175,200,225,250,275];
+				var v = [5,15,25,35,45,55,65,75,85,52];
+
+				return v;
+			}
+
+
+			// get parameters from URL
+			const queryString = window.location.search;
+			const urlParams = new URLSearchParams(queryString);
+			const user_id = urlParams.get('id');
 
 			// Setup
 			var is_question;
 			var include_social_info = true;
 			var idx_test_q, idx_survey_q, idx_personality_q;
 			var questions_test        = init_questions_test();
-			var questions_survey      = init_questions_survey(include_social_info);
+			var questions_survey      = init_questions_survey(include_social_info, user_id);
 			var questions_personality = init_questions_personality();
 			var len_test              = questions_test.length;
 			var len_survey            = questions_survey.length;
@@ -376,12 +424,6 @@
 			var thankyou_screen = { qtext:"To participate in the next session and receive your Amazon voucher please enter your email below (...) We will use your email for no other purposes other than to contact you in regard to this survey and will delete it after you participate or after 90 days, whichever comes first.",
 									qtext2:"Thank you for participating"}
 			var final_screen = { qtext: "", qtext2:"You can close this page now."}
-
-			// get parameters from URL
-			const queryString = window.location.search;
-			const urlParams = new URLSearchParams(queryString);
-			const user_id = urlParams.get('id')
-			console.log("User ID =",user_id);
 
 			// Load first screen
 			loadnextvasq();
@@ -433,6 +475,7 @@
 			document.body.insertBefore(newDiv, currentDiv); 
 		}
 
+		/*
 		function add_social_information_mark()
 		{
 			// add the newly created element and its content into the DOM 
@@ -451,6 +494,7 @@
 			newDiv.style.opacity  = '0.75'
 			document.body.insertBefore(newDiv, currentDiv); 
 		}
+		*/
 
 		// load and hide draggable squares
 		document.body.onload = function(){
@@ -472,11 +516,11 @@
 				  }
 				});
 
-			add_social_information_mark();			
+			//add_social_information_mark();			
 
 			$(".draggablesquare").hide();  
 			$("#ruler").hide()
-			$(".rectangle").hide();
+			//$(".rectangle").hide();
 		}
 
 		});
@@ -517,7 +561,7 @@
 
 		<p id="paragraph">We are researchers from the University of Oxford and King's College London seeking to understand people's opinion on social and political issues.
 		<br><br>
-		If you want to participate, we will be asking your opinion on a series of social and political issues on two sessions (two consecutive days), each taking 10-15 minutes. As you complete the second session, you will earn <b>&pound;X</b> in Amazon vouchers.
+		If you want to participate, we will be asking your opinion on a series of social and political issues on two sessions (two consecutive days), each taking 10-15 minutes. As you complete the second session, you will earn <b>&pound;5</b> in Amazon vouchers.
 		<br><br>
 		You are not obliged to take part in the study and you can later decide to withdraw from the study up to one month after participating by contacting the researchers.
 		<br><br>
@@ -540,7 +584,7 @@
 		</div>
 
 		<div class="next" id="next"><a href="javascript:void(0);">Continue</a></div>
-		<div class="next" id="back"><a href="javascript:void(0);">Back</a></div>
+		<!-- <div class="next" id="back"><a href="javascript:void(0);">Back</a></div> -->
 
 	</body>
 </html>
