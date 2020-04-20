@@ -430,13 +430,40 @@
 				return v;
 			}
 
+			function make_user_id(length)
+			{
+			   var result           = '';
+			   var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+			   var charactersLength = characters.length;
+			   for ( var i = 0; i < length; i++ )
+			      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+			   
+			   return result;
+			}
+
+			// SETUP
 
 			// get parameters from URL
 			const queryString = window.location.search;
 			const urlParams = new URLSearchParams(queryString);
-			const user_id = urlParams.get('id');
+			var user_id = urlParams.get('id');
 
-			// Setup
+			// give user a random ID
+			if( user_id == null )
+			{
+				var url = window.location.href;    
+				user_id = make_user_id(20);
+				if (url.indexOf('?') > -1)
+				{
+				   url += '&id='+user_id
+				}
+				else
+				{
+				   url += '?id='+user_id
+				}
+				window.location.href = url;				
+			}
+			
 			var is_question;
 			var include_social_info = true;
 			var idx_test_q, idx_survey_q, idx_personality_q;
