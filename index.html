@@ -10,17 +10,48 @@
 
 		<script language="javascript">
 		$(function(){
-			$(".vas-scale").on('mousedown', function(e) {
+			$(".vas-scale").on('mousedown', function(e)
+			{
 				$(this).children(".vas-dot").hide();
+				//$("#vas_square").hide();
+
+				rect = document.getElementById("vas-line").getBoundingClientRect()
+				minTopPosition = rect.top - 3;
+				maxTopPosition = rect.bottom - 15;
+
+				$("#vas_square").draggable({
+					  axis: "y",
+					  cursor: "move",
+					  drag: function(event, ui){
+					    var topPosition = ui.position.top;
+					    if (topPosition < minTopPosition)
+					    	{ ui.position.top = minTopPosition; }
+					    if (topPosition > maxTopPosition)
+					    	{ ui.position.top = maxTopPosition; }
+
+						var val=ui.position.top;
+						$("#vas_value").val(val);
+						//console.log(val)
+					  }
+					});
+
 			}).on('mouseup', function(e) {
+
 				var posY = $(this).offset().top;
 				var val=e.pageY - posY;
-				$(this).children("input").val(val);
-				$(this).children(".vas-dot").show().css({"margin-top":val-8});
+
+				// do not show vas-dot, use vas_square instead
+				//$(this).children(".vas-dot").show().css({"margin-top":val-8});
+
+				$("#vas_square").show().css({"top":e.pageY-8});				
+				$("#vas_value").val(val);
 			});
 
 			$(".next").click(function(e)
 			{
+				rect = document.getElementById("vas-line").getBoundingClientRect()
+				minTopPosition = rect.top - 3;
+				maxTopPosition = rect.bottom - 15;
 
 				// Check if the user is pressing the Back button
 				if( $(this).attr('id') == 'back' )
@@ -33,20 +64,24 @@
 					//if (false) // for debugging
 					{
 						var v=$("#vas_value").val();
-						/*if( v == "NA")
+						if( v == "NA")
 						{
 							return false;
-						}*/
+						}
 						if( idx_test_q == 0 ) // first test question
 						{
-							if( v > 20 )
+							console.log('Answering first test q:', v)
+							//window.alert(v)
+							if( v > minTopPosition+10 )
 								return false;
 							else
 								$("#vas_value").val("NA")
 						}
 						else if( idx_test_q == 1 ) // second test question
 						{
-							if( v < 335 )
+							console.log('Answering first test q:', v)
+							//window.alert(v)
+							if( v < maxTopPosition-15 )
 								return false;
 							else
 								$("#vas_value").val("NA")
@@ -96,7 +131,6 @@
 				idx_test_q        = current_screen-1;
 				idx_survey_q      = current_screen-len_test-2;
 				idx_personality_q = current_screen-len_survey-len_test-4;
-				//console.log(idx_test_q, idx_survey_q, idx_personality_q, current_screen)
 
 				if( current_screen == -1 )
 				{
@@ -373,7 +407,6 @@
 
 					ypositions.push({ key:issue, value:yposition })
 				}
-
 				console.log(ypositions)
 			}
 
@@ -415,6 +448,10 @@
 			var len_personality       = questions_personality.length;
 
 			var current_screen = -1;
+
+
+			//current_screen = 0;
+
 
 			var first_screen = { qtext:"", qtext2:"Welcome!"}
 			var pre_test_screen = { qtext:"Let's first practice with two test questions.", qtext2:"Practice:"}
@@ -496,13 +533,27 @@
 		}
 		*/
 
-		// load and hide draggable squares
-		document.body.onload = function(){
-			// add draggable elements
-			minTopPosition = 135;
-			maxTopPosition	 = minTopPosition+490;
+		function add_vas_square()
+		{
+			var vas_scale = document.getElementById("vas-scale"); 
+			var vas_square = document.createElement("div"); 
 
+  		    // set a class
+			vas_square.setAttribute('class', 'draggablesquare');
+			vas_square.setAttribute('id', 'vas_square');
+			vas_square.style.left = '50%'
+			vas_square.style.marginLeft = '-10px'
+			vas_square.style.height  = '2px'
+			vas_square.style.backgroundColor = '#000'
+			document.body.insertBefore(vas_square, vas_scale); 			
+		}
+
+		// load and hide draggable squares
+		document.body.onload = function()
+		{	
 			add_issue_squares();
+			minTopPosition = 135;
+			maxTopPosition = minTopPosition+490;
 
 			$(".draggablesquare").draggable({
 				  //axis: "y",
@@ -516,7 +567,8 @@
 				  }
 				});
 
-			//add_social_information_mark();			
+			//add_social_information_mark();
+			add_vas_square();
 
 			$(".draggablesquare").hide();  
 			$("#ruler").hide()
