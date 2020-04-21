@@ -17,8 +17,8 @@
 .draggablesquare {
   color: white;
   font-family: 'Work Sans', sans-serif;
-  font-size: 120%;
-  padding: 10px;
+  font-size: 5.0vw;
+  padding: 1.2vw;
   position: absolute;
   z-index: 9;
   cursor: move;

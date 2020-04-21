@@ -300,11 +300,11 @@
 					"The government should be doing more to tackle climate change",
 					"The government should take more steps to reduce social inequality",
 					"The government should do more to protect human rights regardless of race, religion etc.",
-					"More should be done to reach gender equality",
+					"More should be done to ensure women have equal rights to men",
 					"It is important to ensure LGBTQ+ people have the same rights as other members of society",
 					"The government should reduce the level of immigration into Britain",
 					"NHS patients' data should be made available for academic medical research",
-					"Social media sites should not display false news stories on their websites",
+					"Social media websites should not display fake news stories",
 					"I would support action to tackle online hate speech"
 					//Leaving the EU will be positive for the United Kingdom
 				];
@@ -474,7 +474,7 @@
 			var current_screen = -1;
 
 			// for debugging
-			current_screen = 11;
+			current_screen = 13;
 
 
 			var first_screen = { qtext:"", qtext2:"Welcome!"}
@@ -509,19 +509,19 @@
 
 		function add_issue_squares()
 		{
-			issue_names = ["Hate speech","Gender rights","Human rights","Immigration","Social inequality",
-						   "LGBTQ+ rights","NHS data","Climate change","False news","Brexit"];
+			issue_names = ["Tackling hate speech","Women's rights","Human rights","Reducing immigration","Social inequality",
+						   "LGBTQ+ rights","Data for medical research","Climate change","Fake news","Leaving the EU"];
 
 			// add the newly created element and its content into the DOM 
 			var currentDiv = document.getElementById("next"); 
+			x0 = 30;
+			y0 = (window.innerHeight)*0.2;
+			spacing = (window.innerHeight)/16;
+
 			for(var j=0; j<10; j++)
 			{
-				// One column
-				xposition = 20;
-				yposition = 150 + 50*j;
-				// Two columns
-				//xposition = 20  + (j - j%5)*15;
-				//yposition = 250 + 50*(j%5);
+				xposition = x0;
+				yposition = y0 + spacing*j;
 				currentDiv = addSquare(currentDiv, issue_names[j], xposition, yposition);
 			}
 
@@ -530,9 +530,9 @@
   		    // set a class
 			newDiv.setAttribute('class', 'vas-line');
 			newDiv.setAttribute('id', 'ruler');
-			newDiv.style.left = '300px'
-			newDiv.style.top  = '150px'
-			newDiv.style.height  = '500px'
+			newDiv.style.top  = (window.innerHeight)*0.2
+			newDiv.style.left = (window.innerWidth)*0.75
+			newDiv.style.height  = (window.innerHeight)*0.6
 			document.body.insertBefore(newDiv, currentDiv); 
 		}
 
