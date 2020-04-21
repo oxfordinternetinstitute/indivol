@@ -12,14 +12,11 @@
 		$(function(){
 			$(".vas-scale").on('mousedown', function(e)
 			{
-				//$(this).children(".vas-dot").hide();
-				//$("#vas_square").hide();
-
 				rect = document.getElementById("vas-line").getBoundingClientRect()
 				minTopPosition = rect.top - 3;
 				maxTopPosition = rect.bottom - 15;
 
-				$("#vas_square").draggable({
+				$("#vas_dot").draggable({
 					  axis: "y",
 					  cursor: "move",
 					  drag: function(event, ui){
@@ -31,19 +28,17 @@
 
 						var val=ui.position.top;
 						$("#vas_value").val(val);
-						//console.log(val)
 					  }
 					});
 
 			}).on('mouseup', function(e) {
 
 				var posY = $(this).offset().top;
-				var val=e.pageY - posY;
+				//var val=e.pageY - posY;
+				//$("#vas_dot").show().css({"top":e.pageY-8});
 
-				// do not show vas-dot, use vas_square instead
-				//$(this).children(".vas-dot").show().css({"margin-top":val-8});
-
-				$("#vas_square").show().css({"top":e.pageY-8});				
+				var val=e.pageY-8;				
+				$("#vas_dot").show().css({"top":val});
 				$("#vas_value").val(val);
 			});
 
@@ -79,7 +74,7 @@
 						}
 						else if( idx_test_q == 1 ) // second test question
 						{
-							console.log('Answering first test q:', v)
+							console.log('Answering second test q:', v)
 							//window.alert(v)
 							if( v < maxTopPosition-15 )
 								return false;
@@ -204,11 +199,12 @@
 				$("#qtext2").text(screen["qtext2"]);
 				//$("#paragraph").text("");
 				$(".vas").hide();
+				$(".draggabledot").hide();
 				$("#next").text("Continue");
 				$("#next").css({ position: "relative"}).appendTo('body');
 				$("#back").hide();
 
-				$(".rectangle").hide();
+				//$(".rectangle").hide();
 
 				if( screen["qtext2"] == "Practice:")
 					$("#paragraph").hide();
@@ -257,6 +253,7 @@
 				}
 				*/
 				$(".draggablesquare").hide();
+				$(".draggabledot").hide();
 			}
 
 			function shuffle(array)
@@ -477,7 +474,7 @@
 			var current_screen = -1;
 
 
-			//current_screen = 0;
+			//current_screen = 13;
 
 
 			var first_screen = { qtext:"", qtext2:"Welcome!"}
@@ -560,32 +557,32 @@
 		}
 		*/
 
-		function add_vas_square()
+		function add_vas_dot()
 		{
 			var vas_scale = document.getElementById("vas-scale"); 
-			var vas_square = document.createElement("div"); 
+			var vas_dot = document.createElement("div"); 
 
   		    // set a class
-			vas_square.setAttribute('class', 'draggablesquare');
-			vas_square.setAttribute('id', 'vas_square');
-			vas_square.style.left = '50%'
-			vas_square.style.marginLeft = '-10px'
-			vas_square.style.height  = '2px'
-			vas_square.style.backgroundColor = '#000'
-			document.body.insertBefore(vas_square, vas_scale); 			
+			vas_dot.setAttribute('class', 'draggabledot');
+			vas_dot.setAttribute('id', 'vas_dot');
+			vas_dot.style.left = '50%'
+			vas_dot.style.marginLeft = '-10px'
+			vas_dot.style.height  = '2px'
+			vas_dot.style.backgroundColor = '#000'
+			document.body.insertBefore(vas_dot, vas_scale); 			
 		}
 
 		// load and hide draggable squares
 		document.body.onload = function()
 		{	
 			add_issue_squares();
-			minTopPosition = 135;
-			maxTopPosition = minTopPosition+490;
 
 			$(".draggablesquare").draggable({
 				  //axis: "y",
 				  cursor: "move",
 				  drag: function(event, ui){
+				  	minTopPosition = 135;
+					maxTopPosition = minTopPosition+490;
 				    var topPosition = ui.position.top;
 				    if (topPosition < minTopPosition)
 				    	{ ui.position.top = minTopPosition; }
@@ -594,12 +591,14 @@
 				  }
 				});
 
-			//add_social_information_mark();
-			add_vas_square();
-
 			$(".draggablesquare").hide();  
 			$("#ruler").hide()
+			
+			//add_social_information_mark();
 			//$(".rectangle").hide();
+
+			add_vas_dot();
+			$(".draggabledot").hide();
 		}
 
 		});

@@ -1,4 +1,4 @@
-.draggablesquare {
+.draggabledot {
   color: white;
   font-family: 'Work Sans', sans-serif;
   font-size: 120%;
@@ -12,6 +12,19 @@
   -moz-border-radius: 50%;
   -webkit-border-radius: 50%;
   border-radius: 50%;
+}
+
+.draggablesquare {
+  color: white;
+  font-family: 'Work Sans', sans-serif;
+  font-size: 120%;
+  padding: 10px;
+  position: absolute;
+  z-index: 9;
+  cursor: move;
+  background-color: #c4c4c4;
+  text-align: center;
+  color: #000;
 }
 
 .rectangle {
