@@ -12,7 +12,7 @@
 		$(function(){
 			$(".vas-scale").on('mousedown', function(e)
 			{
-				$(this).children(".vas-dot").hide();
+				//$(this).children(".vas-dot").hide();
 				//$("#vas_square").hide();
 
 				rect = document.getElementById("vas-line").getBoundingClientRect()
@@ -239,7 +239,7 @@
 				$(".vas").show();
 				$("#label1").text(label1);
 				$("#label2").text(label2);
-				$(".vas-dot").hide();
+				//$(".vas-dot").hide();
 				$("#next").text("Next");
 				$("#next").css({ position: "absolute", right:'7'}).appendTo('body');
 				$("#back").show();
@@ -655,7 +655,6 @@
 			<div class="vas-label" id="label1">Strongly agree</div>
 			<div class="vas-scale">
 				<div class="vas-line" id="vas-line"></div>
-				<div class="vas-dot" draggable="true"></div>
 				<input type="hidden" id="vas_value" name="vas_value" value="NA">
 			</div>
 			<div class="vas-label" id="label2">Strongly disagree</div>

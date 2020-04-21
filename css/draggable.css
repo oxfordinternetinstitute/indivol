@@ -9,6 +9,9 @@
   background-color: #c4c4c4;
   text-align: center;
   color: #000;
+  -moz-border-radius: 50%;
+  -webkit-border-radius: 50%;
+  border-radius: 50%;
 }
 
 .rectangle {
