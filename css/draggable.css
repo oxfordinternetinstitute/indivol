@@ -6,7 +6,7 @@
   position: absolute;
   z-index: 9;
   cursor: move;
-  background-color: #c4c4c4;
+  background-color: #dadada;
   text-align: center;
   color: #000;
   -moz-border-radius: 50%;
@@ -22,7 +22,7 @@
   position: absolute;
   z-index: 9;
   cursor: move;
-  background-color: #c4c4c4;
+  background-color: #c7efff;
   text-align: center;
   color: #000;
 }

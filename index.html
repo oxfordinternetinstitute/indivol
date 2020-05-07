@@ -5,8 +5,9 @@
 		<link  href = "https://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css" rel = "stylesheet">
 		<script src = "https://code.jquery.com/jquery-1.10.2.js"></script>
 		<script src = "https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
-
 		<script src="js/jquery.ui.touch-punch.min.js"></script>
+
+		<link rel="shortcut icon" type="image/ico" href="images/favicon.ico">
 
 		<script language="javascript">
 		$(function(){
@@ -185,10 +186,9 @@
 				{
 					loadscreen(final_screen) 
 					//TODO: Save questions to server with unique user id.
-					//TODO: Send to post-experiment questionaire					
 				}
 				current_screen++;
-				//console.log("now current_screen =",current_screen)
+				console.log("now current_screen =",current_screen)
 
 			}
 
@@ -204,8 +204,6 @@
 				$("#next").css({ position: "relative"}).appendTo('body');
 				$("#back").hide();
 
-				//$(".rectangle").hide();
-
 				if( screen["qtext2"] == "Practice:")
 					$("#paragraph").hide();
 				if( screen["qtext2"] == "Thank you for participating")
@@ -213,7 +211,7 @@
 				else if( screen["qtext2"] == "You can close this page now.")
 					$("#next").hide();
 
-				if( screen["qtext"] == "Ranking questions.")
+				if( screen == ranking_screen )
 				{
 					$("#next").css({ position: "absolute", right:'7'}).appendTo('body');
 					$(".draggablesquare").show();
@@ -242,16 +240,6 @@
 				$("#back").text("Back");
 				$("#back").css({ position: "absolute", left:'27'}).appendTo('body');
 
-				/*
-				if( social_info != "" )
-				{
-					var bodyRect = document.body.getBoundingClientRect(),
-					    elemRect = $("#vas-line")[0].getBoundingClientRect(),
-					    offset   = elemRect.top - bodyRect.top;
-					$(".rectangle").css({ position: "absolute", top:social_info+offset}).appendTo('body');
-					$(".rectangle").show();
-				}
-				*/
 				$(".draggablesquare").hide();
 				$(".draggabledot").hide();
 			}
@@ -461,8 +449,10 @@
 				window.location.href = url;				
 			}
 			
+			// False for the first wave, True for the second wave (treatment group)
+			var include_social_info = false;
+
 			var is_question;
-			var include_social_info = true;
 			var idx_test_q, idx_survey_q, idx_personality_q;
 			var questions_test        = init_questions_test();
 			var questions_survey      = init_questions_survey(include_social_info, user_id);
@@ -478,12 +468,12 @@
 
 
 			var first_screen = { qtext:"", qtext2:"Welcome!"}
-			var pre_test_screen = { qtext:"Let's first practice with two test questions.", qtext2:"Practice:"}
-			var pre_survey_screen = { qtext:"Now that the practice questions are done, let's do the real questions.", qtext2:"Ready!"}
-			var ranking_screen = { qtext:"Ranking questions.", qtext2:"Next"}
-			var pre_personality_screen = { qtext:"Personality questions.", qtext2:"Next"}
-			var thankyou_screen = { qtext:"To participate in the next session and receive your Amazon voucher please enter your email below (...) We will use your email for no other purposes other than to contact you in regard to this survey and will delete it after you participate or after 90 days, whichever comes first.",
-									qtext2:"Thank you for participating"}
+			var pre_test_screen = { qtext:"First, let's practice with two test questions.", qtext2:"Practice:"}
+			var pre_survey_screen = { qtext:"Now that we are done with the practice questions, let's start.", qtext2:"Ready!"}
+			var ranking_screen = { qtext:"Please place sort these issues on the line on the right, from most important (on the top) to least important (on the bottom).", qtext2:""}
+			var pre_personality_screen = { qtext:"We will now ask you a series of questions about yourself.", qtext2:"Next:"}
+			var thankyou_screen = { qtext:"To participate in the next session and receive your Amazon voucher please enter your email below. We will use your email for no other purposes other than to contact you in regard to this survey and will delete it after you participate or after 90 days, whichever comes first.",
+									qtext2:"Thank you for participating!"}
 			var final_screen = { qtext: "", qtext2:"You can close this page now."}
 
 			// Load first screen
@@ -535,27 +525,6 @@
 			newDiv.style.height  = (window.innerHeight)*0.6
 			document.body.insertBefore(newDiv, currentDiv); 
 		}
-
-		/*
-		function add_social_information_mark()
-		{
-			// add the newly created element and its content into the DOM 
-			var currentDiv = document.getElementById("next"); 
-
-			// create a new div element 
-			var newDiv = document.createElement("div"); 
-
-			    // set a class
-			    xposition = 100;
-			    yposition = 200;
-			newDiv.setAttribute('class', 'rectangle');
-			newDiv.style.left     = xposition+'px'
-			newDiv.style.top      = yposition+'px'
-			newDiv.style.width    = '200px'
-			newDiv.style.opacity  = '0.75'
-			document.body.insertBefore(newDiv, currentDiv); 
-		}
-		*/
 
 		function add_vas_dot()
 		{

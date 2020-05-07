@@ -1,5 +1,9 @@
 @import url(https://fonts.googleapis.com/css?family=Work+Sans:300,600);
 
+body{
+	background-color: #EBF8FF6A;
+}
+
 h1 {
 	margin: 1px;
 	margin-top: 15px;
