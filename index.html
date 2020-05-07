@@ -6,6 +6,7 @@
 		<script src = "https://code.jquery.com/jquery-1.10.2.js"></script>
 		<script src = "https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
 		<script src="js/jquery.ui.touch-punch.min.js"></script>
+		<script src="js/mobile-check.js"></script>
 
 		<link rel="shortcut icon" type="image/ico" href="images/favicon.ico">
 
@@ -122,6 +123,12 @@
 				loadnextvasq();
 			});
 
+			function get_email()
+			{
+				email = document.getElementById("email").value;
+				return email;
+			}
+
 			function loadnextvasq()
 			{
 				idx_test_q        = current_screen-1;
@@ -170,7 +177,7 @@
 					// we still need to measure the personality traits
 					loadscreen(pre_personality_screen)
 				}				
-				else if ( current_screen < (3 + len_test + len_survey + len_personality) )
+				else if ( current_screen < (4 + len_test + len_survey + len_personality) )
 				{
 					// load a personality question
 					loadvasq(questions_personality[idx_personality_q]["qtext"],
@@ -178,12 +185,15 @@
 							 questions_personality[idx_personality_q]["label1"],
 							 questions_personality[idx_personality_q]["label2"]);
 				}				
-				else if ( current_screen == (3 + len_test + len_survey + len_personality) )
+				else if ( current_screen == (4 + len_test + len_survey + len_personality) )
 				{
 					loadscreen(thankyou_screen)
 				}
 				else
 				{
+					var email = get_email();
+					console.log(email)
+
 					loadscreen(final_screen) 
 					//TODO: Save questions to server with unique user id.
 				}
@@ -203,20 +213,37 @@
 				$("#next").text("Continue");
 				$("#next").css({ position: "relative"}).appendTo('body');
 				$("#back").hide();
+				$("#email").hide();
 
 				if( screen["qtext2"] == "Practice:")
 					$("#paragraph").hide();
-				if( screen["qtext2"] == "Thank you for participating")
+
+				else if( screen == thankyou_screen )
+				{
 					$("#next").text("Submit");
-				else if( screen["qtext2"] == "You can close this page now.")
+
+					$("#email").show();
+					/*
+					var email_field = document.createElement("INPUT");
+  					email_field.setAttribute("type", "text");
+  					//email_field.setAttribute("value", "Your email here");
+ 				    email_field.setAttribute('class', 'textfield');
+ 				    email_field.setAttribute('id', 'email_field');
+ 				    email_field.setAttribute('size', '20');
+  					document.body.appendChild(email_field);
+  					*/
+				}
+
+				else if( screen == final_screen )
 					$("#next").hide();
 
-				if( screen == ranking_screen )
+				else if( screen == ranking_screen )
 				{
 					$("#next").css({ position: "absolute", right:'7'}).appendTo('body');
 					$(".draggablesquare").show();
 					$("#ruler").show()
 				}
+
 				else
 				{
 					$(".draggablesquare").hide();
@@ -325,24 +352,35 @@
 					}
 				}
 
-				//This question is always last
-				if( include_social_info )
+				//These questions are always last
+
+				final_questions = ["Leaving the EU will be positive for the United Kingdom",
+				 "I am concerned about the risk COVID-19 poses to myself",
+				 "I am concerned about the risk COVID-19 poses to the country as a whole",
+				 "I am confident in the ability of the NHS to deal with those who have COVID-19"]
+
+				while( i < (raw_qs.length + 4) )
 				{
-					soc_info_text = "A recent poll shows "+soc_infos[i]+"% of British people agree with this statement:"
-					
-					questions.push({id:questions.length,
-						qtext:"Leaving the EU will be positive for the United Kingdom",
-						qtext2:soc_info_text,
-						label1:"I strongly agree", label2:"I strongly disagree",
-						soc_info:soc_infos[i]});
+					if( include_social_info )
+					{
+						soc_info_text = "A recent poll shows "+soc_infos[i]+"% of British people agree with this statement:"
+						
+						questions.push({id:questions.length,
+							qtext:final_questions[i-raw_qs.length],
+							qtext2:soc_info_text,
+							label1:"I strongly agree", label2:"I strongly disagree",
+							soc_info:soc_infos[i]});
+					}
+					else
+					{
+						questions.push({id:questions.length,
+							qtext:final_questions[i-raw_qs.length],
+							qtext2:"How much do you agree with the following?",
+							label1:"Strongly agree",label2:"Strongly disagree"})
+					}
+
+					i++;
 				}
-				else
-				{
-					questions.push({id:questions.length,
-						qtext:"Leaving the EU will be positive for the United Kingdom",
-						qtext2:"How much do you agree with the following?",
-						label1:"Strongly agree",label2:"Strongly disagree"})
-				}				
 
 
 				return questions;
@@ -410,7 +448,7 @@
 				console.log("Loading social information from server for user", user_id)
 
 				//var v = [50,75,100,125,150,175,200,225,250,275];
-				var v = [5,15,25,35,45,55,65,75,85,52];
+				var v = [5,15,25,35,45,55,65,75,85,52,53,54,55];
 
 				return v;
 			}
@@ -464,8 +502,7 @@
 			var current_screen = -1;
 
 			// for debugging
-			current_screen = 13;
-
+			//current_screen = 20;
 
 			var first_screen = { qtext:"", qtext2:"Welcome!"}
 			var pre_test_screen = { qtext:"First, let's practice with two test questions.", qtext2:"Practice:"}
@@ -475,6 +512,15 @@
 			var thankyou_screen = { qtext:"To participate in the next session and receive your Amazon voucher please enter your email below. We will use your email for no other purposes other than to contact you in regard to this survey and will delete it after you participate or after 90 days, whichever comes first.",
 									qtext2:"Thank you for participating!"}
 			var final_screen = { qtext: "", qtext2:"You can close this page now."}
+
+			var isMobile = window.mobileCheck();
+			if( !isMobile )
+			{
+				final_screen['qtext2'] = "Please open this page on a mobile device."
+				current_screen = 30;
+				$("#paragraph").hide();
+				$("#next").hide();
+			}
 
 			// Load first screen
 			loadnextvasq();
@@ -560,12 +606,10 @@
 				  }
 				});
 
-			$(".draggablesquare").hide();  
+			$(".draggablesquare").hide();
 			$("#ruler").hide()
+			$("#email").hide();
 			
-			//add_social_information_mark();
-			//$(".rectangle").hide();
-
 			add_vas_dot();
 			$(".draggabledot").hide();
 		}
@@ -629,8 +673,13 @@
 			</div>
 		</div>
 
-		<div class="next" id="next"><a href="javascript:void(0);">Continue</a></div>
-		<!-- <div class="next" id="back"><a href="javascript:void(0);">Back</a></div> -->
+		<div id="container">
+		    <div id="content">
+		        <input type="text" id="email" name="email" placeholder="Email">
+		        <div class="next" id="next"><a href="javascript:void(0);">Continue</a></div>
+		    </div>
+		</div>
+		<!-- <div class="next" id="next"><a href="javascript:void(0);">Continue</a></div> -->
 
 	</body>
 </html>
