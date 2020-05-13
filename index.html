@@ -382,9 +382,7 @@
 					i++;
 				}
 
-
 				return questions;
-				//TODO: Fix so that "id" property is constant and not shuffled
 			}
 
 			function init_questions_personality()
@@ -439,6 +437,7 @@
 				timestamp = new Date();
 				console.log("Saving questions:")			
 				console.log("User ID =",user_id);
+				console.log("Device = ",window.navigator.userAgent);
 				console.log("Timestamp:", timestamp)
 				console.log(questions)
 			}
@@ -504,7 +503,7 @@
 			// for debugging
 			//current_screen = 20;
 
-			var first_screen = { qtext:"", qtext2:"Welcome!"}
+			var first_screen = { qtext:"", qtext2:"Public opinion study!"}
 			var pre_test_screen = { qtext:"First, let's practice with two test questions.", qtext2:"Practice:"}
 			var pre_survey_screen = { qtext:"Now that we are done with the practice questions, let's start.", qtext2:"Ready!"}
 			var ranking_screen = { qtext:"Please sort these issues on the line on the right, from most important (on the top) to least important (on the bottom).", qtext2:""}
@@ -650,7 +649,7 @@
 		
 		<h1 id="qtext2" > Welcome!</h1>
 
-		<p id="paragraph">We are researchers from the University of Oxford and King's College London seeking to understand people's opinion on social and political issues.
+		<p id="paragraph">Welcome! We are researchers from the University of Oxford and King's College London seeking to understand people's opinion on social and political issues.
 		<br><br>
 		If you want to participate, we will be asking your opinion on a series of social and political issues on two sessions (two consecutive days), each taking 10-15 minutes. As you complete the second session, you will earn <b>&pound;5</b> in Amazon vouchers.
 		<br><br>
