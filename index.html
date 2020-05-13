@@ -68,20 +68,42 @@
 						if( idx_test_q == 0 ) // first test question
 						{
 							console.log('Answering first test q:', v)
-							//window.alert(v)
 							if( v > minTopPosition+10 )
+							{
+								// make the question text red
+								document.getElementById("qtext").style.color = '#FF0000';
+
+								// make the question text bold
+								//document.getElementById("qtext").style.fontWeight = "900";
+
 								return false;
+							}
 							else
+							{
+								// make the question text black
+								document.getElementById("qtext").style.color = '#000000';
 								$("#vas_value").val("NA")
+							}
 						}
 						else if( idx_test_q == 1 ) // second test question
 						{
 							console.log('Answering second test q:', v)
-							//window.alert(v)
 							if( v < maxTopPosition-15 )
+							{
+								// make the question text red
+								document.getElementById("qtext").style.color = '#FF0000';
+
+								// make the question text bold
+								//document.getElementById("qtext").style.fontWeight = "900";
+								
 								return false;
+							}
 							else
+							{
+								// make the question text black
+								document.getElementById("qtext").style.color = '#000000';
 								$("#vas_value").val("NA")
+							}
 						}					
 						else if (  idx_survey_q < len_survey )
 						{
