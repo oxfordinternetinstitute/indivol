@@ -323,8 +323,10 @@
 					"I would support action to tackle online hate speech"
 					//Leaving the EU will be positive for the United Kingdom
 				];
-				raw_qs=shuffle(raw_qs);
-				
+
+				question_indices = [...Array(9).keys()]
+				question_indices = shuffle(question_indices);
+
 				var soc_infos = get_socinfo_from_server(user_id);
 
 				var questions=[];
@@ -332,17 +334,17 @@
 
 				for (var i=0; i<raw_qs.length; i++)
 				{
-					var q=raw_qs[i];
+					var q=raw_qs[question_indices[i]];
 
 					if( include_social_info )
 					{
-						soc_info_text = "A recent poll shows "+soc_infos[i]+"% of British people agree with this statement:"
+						soc_info_text = "A recent poll shows "+soc_infos[question_indices[i]]+"% of British people agree with this statement:"
 						
 						questions.push({id:id++, qtext: q,
 										//qtext2:"How much do you agree with the following?",
 										qtext2:soc_info_text,
 										label1:"I strongly agree", label2:"I strongly disagree",
-										soc_info:soc_infos[i]});
+										soc_info:soc_infos[question_indices[i]]});
 					}
 					else
 					{
@@ -405,7 +407,7 @@
 
 				for (var i=0; i<raw_qs.length; i++)
 				{
-					var q=raw_qs[i];
+					var q=raw_qs[question_indices[i]];
 					questions.push({id:id++, qtext:"I see myself as "+q,
 									qtext2:"How much do you agree with the following?",
 									label1:"Strongly agree",label2:"Strongly disagree"});
@@ -491,6 +493,7 @@
 
 			var is_question;
 			var idx_test_q, idx_survey_q, idx_personality_q;
+			var question_indices;
 			var questions_test        = init_questions_test();
 			var questions_survey      = init_questions_survey(include_social_info, user_id);
 			var questions_personality = init_questions_personality();
@@ -503,7 +506,7 @@
 			// for debugging
 			//current_screen = 20;
 
-			var first_screen = { qtext:"", qtext2:"Public opinion study!"}
+			var first_screen = { qtext:"", qtext2:"Public opinion study"}
 			var pre_test_screen = { qtext:"First, let's practice with two test questions.", qtext2:"Practice:"}
 			var pre_survey_screen = { qtext:"Now that we are done with the practice questions, let's start.", qtext2:"Ready!"}
 			var ranking_screen = { qtext:"Please sort these issues on the line on the right, from most important (on the top) to least important (on the bottom).", qtext2:""}
@@ -544,8 +547,8 @@
 
 		function add_issue_squares()
 		{
-			issue_names = ["Tackling hate speech","Women's rights","Human rights","Reducing immigration","Social inequality",
-						   "LGBTQ+ rights","Data for medical research","Climate change","Fake news","Leaving the EU"];
+			issue_names = ["Climate change","Social inequality","Human rights","Women's rights","LGBTQ+ rights",
+						   "Reducing immigration","Data for medical research","Fake news","Tackling hate speech","Leaving the EU"];
 
 			// add the newly created element and its content into the DOM 
 			var currentDiv = document.getElementById("next"); 
@@ -553,12 +556,16 @@
 			y0 = (window.innerHeight)*0.2;
 			spacing = (window.innerHeight)/16;
 
-			for(var j=0; j<10; j++)
+			for(var j=0; j<9; j++)
 			{
 				xposition = x0;
 				yposition = y0 + spacing*j;
-				currentDiv = addSquare(currentDiv, issue_names[j], xposition, yposition);
+				currentDiv = addSquare(currentDiv, issue_names[question_indices[j]], xposition, yposition);
 			}
+			j = 9
+			xposition = x0;
+			yposition = y0 + spacing*j;
+			currentDiv = addSquare(currentDiv, issue_names[9], xposition, yposition);			
 
 			// add line
 			var newDiv = document.createElement("div"); 
