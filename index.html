@@ -1,4 +1,6 @@
 <html>
+<?php include("db/save_functions.php")?>
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<head>
 		<script src="js/jquery-3.4.1.js"></script>
@@ -137,19 +139,94 @@
 				timeDiff  = time_end();
 
 				if( idx_survey_q < len_survey ) // if the user is answering the survey questions
-					save_questions(questions_survey); 
+					save_questions(questions_survey, "questions_survey"); 
 				else // if the user has moved on to the personality questions
-					save_questions(questions_personality);
+					save_questions(questions_personality, "questions_personality");
 
 				time_start();
 				loadnextvasq();
 			});
 
-			function get_email()
+			function ajax(elementID,filename,str,post)
 			{
+			    var ajax;
+			    if (window.XMLHttpRequest)
+			    {
+			        ajax=new XMLHttpRequest();//IE7+, Firefox, Chrome, Opera, Safari
+			    }
+			    else if (ActiveXObject("Microsoft.XMLHTTP"))
+			    {
+			        ajax=new ActiveXObject("Microsoft.XMLHTTP");//IE6/5
+			    }
+			    else if (ActiveXObject("Msxml2.XMLHTTP"))
+			    {
+			        ajax=new ActiveXObject("Msxml2.XMLHTTP");//other
+			    }
+			    else
+			    {
+			        alert("Error: Your browser does not support AJAX.");
+			        return false;
+			    }
+			    ajax.onreadystatechange=function()
+			    {
+			        if (ajax.readyState==4&&ajax.status==200)
+			        {
+			            //document.getElementById(elementID).innerHTML=ajax.responseText;
+				    console.log(ajax.responseText);
+			        }
+			    }
+			    if (post==false)
+			    {
+			        ajax.open("GET",filename+str,true);
+			        ajax.send(null);
+			    }
+			    else
+			    {
+			        ajax.open("POST",filename,true);
+			        ajax.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+			        ajax.send(str);
+			    }
+			    return ajax;
+			}
+			
+			function save_email()
+			{
+				filename='db/save_functions.php'
+				elementID=''
 				email = document.getElementById("email").value;
+				params_str = 'user_id=' + user_id + '&section='+ 'email' + '&payload=' + email
+				post=true;
+				ax = ajax(elementID, filename, params_str, post);
+			}
+
+			/*
+			function save_email2()
+			{
+  				var xmlhttp = new XMLHttpRequest();
+				xmlhttp.onreadystatechange = function() {
+					console.log(this.readyState, this.status);
+					if (this.readyState == 4 && this.status == 200) {
+						// this.responseText will take the response of the request call
+					        //document.getElementById("txtHint").innerHTML = this.responseText;
+						console.log("this.responseText:");
+						console.log(this.responseText);
+						}
+					};
+
+				email = document.getElementById("email").value;
+				params_str = 'user_id=' + user_id + '&email='+email
+
+				// GET
+				//xmlhttp.open("GET", "db/save_functions.php?" + str, true);
+			    	//xmlhttp.send();
+
+				// POST
+				xmlhttp.open("POST", "db/save_functions.php", true); // true for asynchronous, false for synchronous
+			    	xmlhttp.send("format=json");
+								
 				return email;
 			}
+			*/
 
 			function loadnextvasq()
 			{
@@ -213,11 +290,8 @@
 				}
 				else
 				{
-					var email = get_email();
-					console.log(email)
-
+					save_email();
 					loadscreen(final_screen) 
-					//TODO: Save questions to server with unique user id.
 				}
 				current_screen++;
 				console.log("now current_screen =",current_screen)
@@ -245,7 +319,6 @@
 					$("#next").text("Submit");
 
 					$("#email").show();
-
 					/*
 					var email_field = document.createElement("INPUT");
   					email_field.setAttribute("type", "text");
@@ -430,7 +503,7 @@
 
 				for (var i=0; i<raw_qs.length; i++)
 				{
-					var q=raw_qs[question_indices[i]];
+					var q=raw_qs[i];
 					questions.push({id:id++, qtext:"I see myself as "+q,
 									qtext2:"How much do you agree with the following?",
 									label1:"Strongly agree",label2:"Strongly disagree"});
@@ -454,17 +527,30 @@
 					ypositions.push({ key:issue, value:yposition })
 				}
 				console.log(ypositions)
+
+				elementID=''
+				filename='db/save_functions.php'
+				params_str = 'user_id=' + user_id + '&section='+ 'rankings' + '&payload=' + JSON.stringify(ypositions)
+				post=true;
+				ax = ajax(elementID, filename, params_str, post);
 			}
 
 
-			function save_questions(questions)
+			function save_questions(questions, section)
 			{
-				timestamp = new Date();
-				console.log("Saving questions:")			
-				console.log("User ID =",user_id);
-				console.log("Device = ",window.navigator.userAgent);
-				console.log("Timestamp:", timestamp)
-				console.log(questions)
+				console.log("Saving questions")
+				//console.log("User ID =",user_id);
+				//console.log("Device = ",window.navigator.userAgent);
+				//timestamp = new Date();
+				//console.log("Timestamp:", timestamp)
+				//console.log(questions)
+
+				elementID=''
+				filename='db/save_functions.php'
+				params_str = 'user_id=' + user_id + '&section='+ section + '&payload=' + JSON.stringify(questions)
+				post=true;
+				ax = ajax(elementID, filename, params_str, post);
+				
 			}
 
 			function get_socinfo_from_server(user_id)
@@ -527,7 +613,7 @@
 			var current_screen = -1;
 
 			// for debugging
-			//current_screen = 20;
+			//current_screen = 27;
 
 			var first_screen = { qtext:"", qtext2:"Public opinion study"}
 			var pre_test_screen = { qtext:"First, let's practice with two test questions.", qtext2:"Practice:"}
@@ -704,7 +790,7 @@
 
 		<div id="container">
 		    <div id="content">
-		        <input type="text" id="email" name="email" placeholder="Email">
+			<input type="text" id="email" name="email" placeholder="Email">
 		        <div class="next" id="next"><a href="javascript:void(0);">Continue</a></div>
 		    </div>
 		</div>
