@@ -1,5 +1,6 @@
 <html>
 <?php include("db/save_functions.php")?>
+<?php include("db/load_functions.php")?>
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<head>
@@ -139,15 +140,15 @@
 				timeDiff  = time_end();
 
 				if( idx_survey_q < len_survey ) // if the user is answering the survey questions
-					save_questions(questions_survey, "questions_survey"); 
+					save_questions(questions_survey, "questions_survey_treatment"); 
 				else // if the user has moved on to the personality questions
-					save_questions(questions_personality, "questions_personality");
+					save_questions(questions_personality, "questions_personality_treatment");
 
 				time_start();
 				loadnextvasq();
 			});
 
-			function ajax(elementID,filename,str,post)
+			function ajax(elementID,filename,str,post,load)
 			{
 			    var ajax;
 			    if (window.XMLHttpRequest)
@@ -171,8 +172,14 @@
 			    {
 			        if (ajax.readyState==4&&ajax.status==200)
 			        {
-			            //document.getElementById(elementID).innerHTML=ajax.responseText;
-				    console.log(ajax.responseText);
+				    if(load==true)
+				    {
+			                document.getElementById(elementID).innerHTML=ajax.responseText;
+				    }
+				    else
+				    {
+				        console.log(ajax.responseText);
+				    }
 			        }
 			    }
 			    if (post==false)
@@ -194,39 +201,10 @@
 				filename='db/save_functions.php'
 				elementID=''
 				email = document.getElementById("email").value;
-				params_str = 'user_id=' + user_id + '&section='+ 'email' + '&payload=' + email
+				params_str = 'user_id=' + user_id + '&section='+ 'email_treatment' + '&payload=' + email
 				post=true;
-				ax = ajax(elementID, filename, params_str, post);
+				ax = ajax(elementID, filename, params_str, post, false);
 			}
-
-			/*
-			function save_email2()
-			{
-  				var xmlhttp = new XMLHttpRequest();
-				xmlhttp.onreadystatechange = function() {
-					console.log(this.readyState, this.status);
-					if (this.readyState == 4 && this.status == 200) {
-						// this.responseText will take the response of the request call
-					        //document.getElementById("txtHint").innerHTML = this.responseText;
-						console.log("this.responseText:");
-						console.log(this.responseText);
-						}
-					};
-
-				email = document.getElementById("email").value;
-				params_str = 'user_id=' + user_id + '&email='+email
-
-				// GET
-				//xmlhttp.open("GET", "db/save_functions.php?" + str, true);
-			    	//xmlhttp.send();
-
-				// POST
-				xmlhttp.open("POST", "db/save_functions.php", true); // true for asynchronous, false for synchronous
-			    	xmlhttp.send("format=json");
-								
-				return email;
-			}
-			*/
 
 			function loadnextvasq()
 			{
@@ -531,9 +509,9 @@
 
 				elementID=''
 				filename='db/save_functions.php'
-				params_str = 'user_id=' + user_id + '&section='+ 'rankings' + '&payload=' + JSON.stringify(ypositions)
+				params_str = 'user_id=' + user_id + '&section='+ 'rankings_treatment' + '&payload=' + JSON.stringify(ypositions)
 				post=true;
-				ax = ajax(elementID, filename, params_str, post);
+				ax = ajax(elementID, filename, params_str, post, false);
 			}
 
 
@@ -550,7 +528,7 @@
 				filename='db/save_functions.php'
 				params_str = 'user_id=' + user_id + '&section='+ section + '&payload=' + JSON.stringify(questions)
 				post=true;
-				ax = ajax(elementID, filename, params_str, post);
+				ax = ajax(elementID, filename, params_str, post, false);
 				
 			}
 
@@ -558,7 +536,6 @@
 			{
 				console.log("Loading social information from server for user", user_id)
 
-				//var v = [50,75,100,125,150,175,200,225,250,275];
 				var v = [5,15,25,35,45,55,65,75,85,52,53,54,55];
 
 				return v;
@@ -582,24 +559,8 @@
 			const urlParams = new URLSearchParams(queryString);
 			var user_id = urlParams.get('id');
 
-			// give user a random ID
-			if( user_id == null )
-			{
-				var url = window.location.href;    
-				user_id = make_user_id(20);
-				if (url.indexOf('?') > -1)
-				{
-				   url += '&id='+user_id
-				}
-				else
-				{
-				   url += '?id='+user_id
-				}
-				window.location.href = url;				
-			}
-			
 			// False for the first wave, True for the second wave (treatment group)
-			var include_social_info = false;
+			var include_social_info = true;
 
 			var is_question;
 			var idx_test_q, idx_survey_q, idx_personality_q;
@@ -634,6 +595,16 @@
 				$("#next").hide();
 			}
 
+			// this page should not be run without an user ID
+			if( user_id == null )
+			{
+				final_screen['qtext2']  = "An error has occurred.";
+				final_screen['qtext'] = "You can close this page now.";
+				current_screen = 30;
+				$("#paragraph").hide();
+				$("#next").hide();
+			}
+			
 			// Load first screen
 			loadnextvasq();
 
