@@ -8,3 +8,10 @@ CREATE TABLE IF NOT EXISTS `surveys`.`logging` (
   INDEX `user_section` (`userid` ASC, `section` ASC)  COMMENT '');
 ENGINE = InnoDB;
 DEFAULT CHARACTER SET = utf8;
+
+CREATE TABLE IF NOT EXISTS `surveys`.`socinfo` (
+  `userid` VARCHAR(45) NOT NULL COMMENT '',
+  `percentages` json NULL COMMENT '',
+  INDEX `user_section` (`userid` ASC)  COMMENT '');
+ENGINE = InnoDB;
+DEFAULT CHARACTER SET = utf8;

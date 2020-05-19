@@ -1,15 +1,12 @@
 <?php
 include ".config.php";
 
-function dbloader ($userid, $section, $payload)
+function dbloader ($userid)
 {
 	// Create connection
 	global $servername,$username,$password,$dbname;
 
 	$conn = new mysqli($servername, $username, $password, $dbname);
-
-	//echo " servername: " . $servername . ", username: " . $username . ", pw: " . $password . ", dbname: " . $dbname;
-	//echo ", userid: " . $userid . ", section: " . $section . ", payload: " . $payload . ", dt: " . $datetime;
 
 	// Check connection
 	if ($conn->connect_error) {
@@ -18,23 +15,21 @@ function dbloader ($userid, $section, $payload)
 	}
 
 	// bind parameters and execute
-	$stmt = $conn->prepare("SELECT values FROM socinfo WHERE userid LIKE ?");
+
+	$stmt = $conn->prepare("SELECT percentages FROM socinfo WHERE userid LIKE ?");
 
 	$stmt->bind_param('s', $userid);
 
-	$result = $stmt->execute()
+	$stmt->execute();
 
-	if (!result) {
+	if (!stmt) {
 		throw new Exception('{"error": "Execute failed: (' . $stmt->errno . ') ' . $stmt->error . '"}');
 	}
 
-	if ($result->num_rows > 0)
-	{
-		$row = $result->fetch_assoc();
-		$output = $row['values'];
-	} else {
-		$output = false;
-	}
+	$stmt->bind_result($percentages);
+	$stmt->fetch();
+
+	$output=$percentages;
 
 	$stmt->close();
 	$conn->close();
@@ -42,14 +37,11 @@ function dbloader ($userid, $section, $payload)
 	return $output;
 }
 
-
 if ($_SERVER['REQUEST_METHOD'] == 'POST') 
 {
 	$userid=$_POST["user_id"];
-	$payload=$_POST["payload"];
-
-	dbloader($userid,$section,$payload);
-
+	$output = dbloader($userid);
+	echo json_encode($output);
 }
 elseif ($_SERVER['REQUEST_METHOD'] == 'GET') 
 {
@@ -68,7 +60,6 @@ elseif ($_SERVER['REQUEST_METHOD'] == 'GET')
 else
 {
 	echo "333";
-}
-
+};
 
 ?>
