@@ -16,7 +16,7 @@ function dbloader ($userid)
 
 	// bind parameters and execute
 
-	$stmt = $conn->prepare("SELECT percentages FROM socinfo WHERE userid LIKE ?");
+	$stmt = $conn->prepare("SELECT percentages FROM socinfo WHERE userid = ?");
 
 	$stmt->bind_param('s', $userid);
 
@@ -43,23 +43,5 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
 	$output = dbloader($userid);
 	echo json_encode($output);
 }
-elseif ($_SERVER['REQUEST_METHOD'] == 'GET') 
-{
-	/*
-	$email=$_GET["email"];
-	$userid=$_GET["user_id"];
-	$section="email";
-	//$payload=json_encode($_GET);
-	$datetime=new DateTime();
-	$datetime=$datetime->getTimestamp();
-
-	dbloader($userid,$section,$payload,$datetime);
-	*/
-	echo "222";
-}
-else
-{
-	echo "333";
-};
 
 ?>

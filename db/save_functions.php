@@ -48,24 +48,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
 	dblogger($userid,$section,$payload,$datetime);
 
 }
-elseif ($_SERVER['REQUEST_METHOD'] == 'GET') 
-{
-	/*
-	$email=$_GET["email"];
-	$userid=$_GET["user_id"];
-	$section="email";
-	//$payload=json_encode($_GET);
-	$datetime=new DateTime();
-	$datetime=$datetime->getTimestamp();
-
-	dblogger($userid,$section,$payload,$datetime);
-	*/
-	echo "222";
-}
-else
-{
-	echo "333";
-}
 
 
 ?>
