@@ -10,6 +10,7 @@
 		<script src = "https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
 		<script src="js/jquery.ui.touch-punch.min.js"></script>
 		<script src="js/mobile-check.js"></script>
+		<script src="js/hashes.js"></script>
 
 		<link rel="shortcut icon" type="image/ico" href="images/favicon.ico">
 
@@ -527,8 +528,27 @@
 						}
 					}
 					const ax = ajax(elementID, filename, params_str, post, load, callback);
-					//console.log("ajax part completed");
 				}
+			}            
+
+			function which_list(user_id)
+			{
+				// instead of loading a list of all the user_ids, load a list of all their hashes,
+				// then hash the user_id and see if it matches one of the lists.
+				var user_list;
+				var in_control_list   = check_list(user_id, 'control');
+				var in_treatment_list = check_list(user_id, 'treatment');
+
+				if ( in_control_list )
+				{
+					user_list = 'control';
+				}
+				else if ( in_treatment_list )
+				{
+					user_list = 'treatment';
+				}
+				else user_list = 'neither';
+				return user_list;
 			}
 
 			function make_user_id(length)
@@ -554,7 +574,7 @@
 			var idx_test_q, idx_survey_q, idx_personality_q;
 			var question_indices;
 
-			var include_social_info = true; // false for the first wave, true for the second wave (treatment group)
+			var include_social_info; // false for the first wave and for control, true for the second wave (treatment group)
 			var soc_infos;
 
 			var raw_questions;
@@ -602,7 +622,9 @@
 				{
 				   url += '?id='+user_id
 				}
+
 				round = 'wave1';
+				include_social_info = false;
 				window.location.href = url;	
 
 				// or, when this page should not be run without an user ID
@@ -611,6 +633,27 @@
 				current_screen = 30;
 				$("#paragraph").hide();
 				$("#next").hide();*/
+			}
+			else
+			{
+				var user_list = which_list(user_id);
+
+				if ( user_list == 'control')
+				{
+					round = 'wave2_control';
+					include_social_info = false;
+				}
+				else if ( user_list == 'treatment' )
+				{
+					round = 'wave2_treatment';
+					include_social_info = true;
+				}
+				else // when the ID isn't anywhere, default to round 1
+				{
+					round = 'wave1';
+					include_social_info = false;
+					window.location.href = url;
+				}
 			}
 			
 			// Load first screen

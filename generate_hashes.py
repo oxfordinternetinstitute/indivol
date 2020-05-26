@@ -33,10 +33,10 @@ def generate_random_hashes(n_hashes=1000, seed=1):
 
 	# Save
 
-	with open('random_strings_seed1000.txt','w') as f:
+	with open('random_strings_seed{}.txt'.format(n_hashes),'w') as f:
 		f.write('\n'.join(random_strs))
 
-	with open('random_hashes_seed1000.txt','w') as f:
+	with open('random_hashes_seed{}.txt'.format(n_hashes),'w') as f:
 		f.write('\n'.join([ i.decode('utf-8') for i in random_hashes ]))
 
 	return random_hashes
@@ -57,7 +57,7 @@ def test_random_hashes(hashes):
 	s_hashes = [ i.decode('utf-8') for i in hashes ]
 	distances = ( levenshtein_distance(si, sj) for si, sj in combinations(s_hashes,2) )
 	distances = list(distances)
-	plt.hist(distances, bins=np.)
+	plt.hist(distances, bins=20)
 	plt.yscale('log')
 	plt.ylabel('Count (total={})'.format(len(distances)))
 	plt.xlabel('Distance between pairs of hashes')
