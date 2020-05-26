@@ -1,5 +1,6 @@
 <html>
 <?php include("db/save_functions.php")?>
+<?php include("db/load_functions.php")?>
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<head>
@@ -139,15 +140,15 @@
 				timeDiff  = time_end();
 
 				if( idx_survey_q < len_survey ) // if the user is answering the survey questions
-					save_questions(questions_survey, "questions_survey"); 
+					save_questions(questions_survey, "questions_survey"+"_"+round); 
 				else // if the user has moved on to the personality questions
-					save_questions(questions_personality, "questions_personality");
+					save_questions(questions_personality, "questions_personality"+"_"+round);
 
 				time_start();
 				loadnextvasq();
 			});
 
-			function ajax(elementID,filename,str,post)
+			function ajax(elementID,filename,str,post,load,callback)
 			{
 			    var ajax;
 			    if (window.XMLHttpRequest)
@@ -171,14 +172,21 @@
 			    {
 			        if (ajax.readyState==4&&ajax.status==200)
 			        {
-			            //document.getElementById(elementID).innerHTML=ajax.responseText;
-				    console.log(ajax.responseText);
+					    if(load==true)
+					    {
+				                document.getElementById(elementID).innerHTML=ajax.responseText;
+						if (callback) { callback(); }
+					    }
+					    else
+					    {
+					        console.log(ajax.responseText);
+					    }
 			        }
-			    }
+			    };
 			    if (post==false)
 			    {
-			        ajax.open("GET",filename+str,true);
-			        ajax.send(null);
+			        return "This ajax should only be run with POST";
+
 			    }
 			    else
 			    {
@@ -194,39 +202,10 @@
 				filename='db/save_functions.php'
 				elementID=''
 				email = document.getElementById("email").value;
-				params_str = 'user_id=' + user_id + '&section='+ 'email' + '&payload=' + email
+				params_str = 'user_id=' + user_id + '&section='+ 'email_' + round + '&payload=' + email
 				post=true;
-				ax = ajax(elementID, filename, params_str, post);
+				ax = ajax(elementID, filename, params_str, post, false, false);
 			}
-
-			/*
-			function save_email2()
-			{
-  				var xmlhttp = new XMLHttpRequest();
-				xmlhttp.onreadystatechange = function() {
-					console.log(this.readyState, this.status);
-					if (this.readyState == 4 && this.status == 200) {
-						// this.responseText will take the response of the request call
-					        //document.getElementById("txtHint").innerHTML = this.responseText;
-						console.log("this.responseText:");
-						console.log(this.responseText);
-						}
-					};
-
-				email = document.getElementById("email").value;
-				params_str = 'user_id=' + user_id + '&email='+email
-
-				// GET
-				//xmlhttp.open("GET", "db/save_functions.php?" + str, true);
-			    	//xmlhttp.send();
-
-				// POST
-				xmlhttp.open("POST", "db/save_functions.php", true); // true for asynchronous, false for synchronous
-			    	xmlhttp.send("format=json");
-								
-				return email;
-			}
-			*/
 
 			function loadnextvasq()
 			{
@@ -301,9 +280,9 @@
 			function loadscreen(screen)
 			{
 				is_question = false;
+				$("#hiddenparagraph").hide();
 				$("#qtext").text(screen["qtext"]);
 				$("#qtext2").text(screen["qtext2"]);
-				//$("#paragraph").text("");
 				$(".vas").hide();
 				$(".draggabledot").hide();
 				$("#next").text("Continue");
@@ -317,17 +296,7 @@
 				else if( screen == thankyou_screen )
 				{
 					$("#next").text("Submit");
-
 					$("#email").show();
-					/*
-					var email_field = document.createElement("INPUT");
-  					email_field.setAttribute("type", "text");
-  					//email_field.setAttribute("value", "Your email here");
- 				    email_field.setAttribute('class', 'textfield');
- 				    email_field.setAttribute('id', 'email_field');
- 				    email_field.setAttribute('size', '20');
-  					document.body.appendChild(email_field);
-  					*/
 				}
 
 				else if( screen == final_screen )
@@ -405,9 +374,9 @@
 				return questions;
 			}
 
-			function init_questions_survey(include_social_info, user_id)
+			function init_questions_survey(user_id, callback)
 			{
-				var raw_qs=[
+				raw_questions=[
 					"The government should be doing more to tackle climate change",
 					"The government should take more steps to reduce social inequality",
 					"The government should do more to protect human rights regardless of race, religion etc.",
@@ -417,38 +386,21 @@
 					"NHS patients' data should be made available for academic medical research",
 					"Social media websites should not display fake news stories",
 					"I would support action to tackle online hate speech"
-					//Leaving the EU will be positive for the United Kingdom
 				];
 
 				question_indices = [...Array(9).keys()]
 				question_indices = shuffle(question_indices);
 
-				var soc_infos;
-				if( include_social_info )
-					soc_infos = get_socinfo_from_server(user_id);
-
 				var questions=[];
 				var id=0;
 
-				for (var i=0; i<raw_qs.length; i++)
+				for (var i=0; i<raw_questions.length; i++)
 				{
-					var q=raw_qs[question_indices[i]];
+					var q=raw_questions[question_indices[i]];
 
-					if( include_social_info )
-					{
-						soc_info_text = "A recent poll shows "+soc_infos[question_indices[i]]+"% of British people agree with this statement:"
-						
-						questions.push({id:id++, qtext: q,
-										qtext2:soc_info_text,
-										label1:"I strongly agree", label2:"I strongly disagree",
-										soc_info:soc_infos[question_indices[i]]});
-					}
-					else
-					{
-						questions.push({id:id++, qtext:q,
-										qtext2:"How much do you agree with the following?",
-										label1:"Strongly agree", label2:"Strongly disagree"});
-					}
+					questions.push({id:id++, qtext:q,
+							qtext2:"How much do you agree with the following?",
+							label1:"Strongly agree", label2:"Strongly disagree"});
 				}
 
 				//These questions are always last
@@ -458,28 +410,17 @@
 				 "I am concerned about the risk COVID-19 poses to the country as a whole",
 				 "I am confident in the ability of the NHS to deal with those who have COVID-19"]
 
-				while( i < (raw_qs.length + 4) )
+				while( i < (raw_questions.length + final_questions.length) )
 				{
-					if( include_social_info )
-					{
-						soc_info_text = "A recent poll shows "+soc_infos[i]+"% of British people agree with this statement:"
-						
-						questions.push({id:questions.length,
-							qtext:final_questions[i-raw_qs.length],
-							qtext2:soc_info_text,
-							label1:"I strongly agree", label2:"I strongly disagree",
-							soc_info:soc_infos[i]});
-					}
-					else
-					{
-						questions.push({id:questions.length,
-							qtext:final_questions[i-raw_qs.length],
-							qtext2:"How much do you agree with the following?",
-							label1:"Strongly agree",label2:"Strongly disagree"})
-					}
+					questions.push({id:questions.length,
+						qtext:final_questions[i-raw_questions.length],
+						qtext2:"How much do you agree with the following?",
+						label1:"Strongly agree",label2:"Strongly disagree"})
 
 					i++;
 				}
+
+				callback();
 
 				return questions;
 			}
@@ -531,37 +472,63 @@
 
 				elementID=''
 				filename='db/save_functions.php'
-				params_str = 'user_id=' + user_id + '&section='+ 'rankings' + '&payload=' + JSON.stringify(ypositions)
+				params_str = 'user_id=' + user_id + '&section='+ 'rankings_' + round + '&payload=' + JSON.stringify(ypositions)
 				post=true;
-				ax = ajax(elementID, filename, params_str, post);
+				ax = ajax(elementID, filename, params_str, post, false, false);
 			}
 
 
 			function save_questions(questions, section)
 			{
 				console.log("Saving questions")
-				//console.log("User ID =",user_id);
-				//console.log("Device = ",window.navigator.userAgent);
-				//timestamp = new Date();
-				//console.log("Timestamp:", timestamp)
-				//console.log(questions)
 
 				elementID=''
 				filename='db/save_functions.php'
 				params_str = 'user_id=' + user_id + '&section='+ section + '&payload=' + JSON.stringify(questions)
 				post=true;
-				ax = ajax(elementID, filename, params_str, post);
+				ax = ajax(elementID, filename, params_str, post, false, false);
 				
 			}
 
-			function get_socinfo_from_server(user_id)
+			function load_socinfo_from_server()
 			{
-				console.log("Loading social information from server for user", user_id)
+				if (include_social_info)
+				{
+					console.log("Loading social information from server for user", user_id)
 
-				//var v = [50,75,100,125,150,175,200,225,250,275];
-				var v = [5,15,25,35,45,55,65,75,85,52,53,54,55];
+					elementID='soc_info_values'
+					filename='db/load_functions.php'
+					params_str = 'user_id=' + user_id 
+					post=true;
+					load=true;
 
-				return v;
+					function callback()
+					{
+						soc_infos = eval(document.getElementById('soc_info_values').innerHTML);
+						soc_infos = eval(soc_infos);
+						
+						// and here add it to the questions
+						
+						for( var i=0; i < (raw_questions.length); i++ )
+						{
+							soc_info_text = "A recent poll shows "+soc_infos[question_indices[i]]+"% of British people agree with this statement:"
+							
+							questions_survey[i]['qtext2']   = soc_info_text;
+							questions_survey[i]['soc_info'] = soc_infos[question_indices[i]];
+						}
+						while( i < questions_survey.length )
+						{
+							soc_info_text = "A recent poll shows "+soc_infos[i]+"% of British people agree with this statement:"
+						
+							questions_survey[i]['qtext2']   = soc_info_text;
+							questions_survey[i]['soc_info'] = soc_infos[i];
+
+							i++;
+						}
+					}
+					const ax = ajax(elementID, filename, params_str, post, load, callback);
+					//console.log("ajax part completed");
+				}
 			}
 
 			function make_user_id(length)
@@ -582,34 +549,22 @@
 			const urlParams = new URLSearchParams(queryString);
 			var user_id = urlParams.get('id');
 
-			// give user a random ID
-			if( user_id == null )
-			{
-				var url = window.location.href;    
-				user_id = make_user_id(20);
-				if (url.indexOf('?') > -1)
-				{
-				   url += '&id='+user_id
-				}
-				else
-				{
-				   url += '?id='+user_id
-				}
-				window.location.href = url;				
-			}
-			
-			// False for the first wave, True for the second wave (treatment group)
-			var include_social_info = false;
-
+			var round;
 			var is_question;
 			var idx_test_q, idx_survey_q, idx_personality_q;
 			var question_indices;
-			var questions_test        = init_questions_test();
-			var questions_survey      = init_questions_survey(include_social_info, user_id);
-			var questions_personality = init_questions_personality();
-			var len_test              = questions_test.length;
+
+			var include_social_info = true; // false for the first wave, true for the second wave (treatment group)
+			var soc_infos;
+
+			var raw_questions;
+			var questions_survey      = init_questions_survey(user_id, load_socinfo_from_server);
 			var len_survey            = questions_survey.length;
+			var questions_test        = init_questions_test();
+			var len_test              = questions_test.length;
+			var questions_personality = init_questions_personality();
 			var len_personality       = questions_personality.length;
+			var final_questions;
 
 			var current_screen = -1;
 
@@ -634,6 +589,30 @@
 				$("#next").hide();
 			}
 
+			if( user_id == null )
+			{
+				// give user a random ID
+				var url = window.location.href;    
+				user_id = make_user_id(20);
+				if (url.indexOf('?') > -1)
+				{
+				   url += '&id='+user_id
+				}
+				else
+				{
+				   url += '?id='+user_id
+				}
+				round = 'wave1';
+				window.location.href = url;	
+
+				// or, when this page should not be run without an user ID
+				/*final_screen['qtext2']  = "An error has occurred.";
+				final_screen['qtext'] = "You can close this page now.";
+				current_screen = 30;
+				$("#paragraph").hide();
+				$("#next").hide();*/
+			}
+			
 			// Load first screen
 			loadnextvasq();
 
@@ -775,7 +754,8 @@
 		Before you agree to participate, you can read all the necessary information about the nature of the study, including usage and protection of your data, <a href="files/participant_information_sheet.pdf"><u>here</u></a>. 
 		<br><br>
 		Please click if you agree to participate.</p>
-
+		<p id="hiddenparagraph"><span id="soc_info_values"></span></p>
+		
 		<h2 id="qtext">Placeholder question text</h2>
 
 		<div class="vas">
