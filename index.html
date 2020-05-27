@@ -186,8 +186,7 @@
 			    };
 			    if (post==false)
 			    {
-			        return "This ajax should only be run with POST";
-
+			        throw "Error: this ajax should only be run with POST";
 			    }
 			    else
 			    {
@@ -652,7 +651,6 @@
 				{
 					round = 'wave1';
 					include_social_info = false;
-					window.location.href = url;
 				}
 			}
 			
