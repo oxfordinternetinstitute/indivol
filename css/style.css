@@ -6,19 +6,19 @@ body{
 
 h1 {
 	margin: 1px;
-	margin-top: 15px;
+	margin-top: 10px;
 	font-family: 'Work Sans', sans-serif;
 	text-align: center;
-	font-size: 7.2vw;
+	font-size: 6.8vw;
 	font-weight: 600;
 }
 
 h2 {
 	margin: 1px;
-	margin-top: 5px;
+	margin-top: 10px;
 	font-family: 'Work Sans', sans-serif;
 	text-align: center;
-	font-size: 5.5vw;
+	font-size: 7.0vw;
 	font-weight: 400;
 	padding: 5px;
 }
