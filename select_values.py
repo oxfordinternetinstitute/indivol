@@ -70,9 +70,20 @@ finally:
         connection.close()
         print("MySQL connection is closed")
 
-# parse loaded userids
-userids = set([ i[0] for i in result ])
-N = len(userids)
+# parse loaded userids and emails
+users = {}
+for i in result:
+    user  = i[0]
+    email = i[2]
+    users[user] = email
+
+userids = []
+emails  = []
+for i,j in users.items():
+    userids += [ str(i) ]
+    emails  += [ str(j) ]
+
+N = len(users)
 
 #---------------------------------------#
 #
@@ -141,6 +152,10 @@ email_message = 'Dear Recipient,\n\nI hope you are doing well.\n\nBest wishes,\n
 email_subject = 'Testing'
 email_from    = "chico.camargo@oii.ox.ac.uk"
 email_to      = "chico.camargo@gmail.com"
+
+for userid,email in zip(userids,emails):
+    userid2 = str(old_to_new_userids[userid])
+    print 'Send email to '+userid+' at email '+email+' with link containing '+userid2
 
 print('Sending email to '+email_to)
 
