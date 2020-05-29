@@ -13,10 +13,13 @@ infile = 'random_hashes_seed10000.txt'
 with open(infile) as f:
     userids = [ line.strip() for line in f.readlines() ]
 
-query_string = ','.join([ '("{}", "{}")'.format(userid, percentages)
-			  for userid, percentages in zip(userids, socinfos) ])
+# 20/80 split
+rounds = ( ['control']*20 + ['treatment']*80 )*100
+
+query_string = ','.join([ '("{}", "{}", "{}")'.format(userid, rd, percentages)
+			  for userid, rd, percentages in zip(userids, rounds, socinfos) ])
  
-mySql_insert_query_prefix = "INSERT INTO socinfo (userid, percentages) VALUES "
+mySql_insert_query_prefix = "INSERT INTO socinfo (userid, round, percentages) VALUES "
 mySql_insert_query = mySql_insert_query_prefix + query_string + ';'
 
 

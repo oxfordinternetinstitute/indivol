@@ -149,59 +149,8 @@
 				loadnextvasq();
 			});
 
-			function ajax2(elementID,filename,str,post,load,callback)
+			function ajax(filename,str,load,callback)
 			{
-			    var ajax;
-			    if (window.XMLHttpRequest)
-			    {
-			        ajax=new XMLHttpRequest();//IE7+, Firefox, Chrome, Opera, Safari
-			    }
-			    else if (ActiveXObject("Microsoft.XMLHTTP"))
-			    {
-			        ajax=new ActiveXObject("Microsoft.XMLHTTP");//IE6/5
-			    }
-			    else if (ActiveXObject("Msxml2.XMLHTTP"))
-			    {
-			        ajax=new ActiveXObject("Msxml2.XMLHTTP");//other
-			    }
-			    else
-			    {
-			        alert("Error: Your browser does not support AJAX.");
-			        return false;
-			    }
-			    ajax.onreadystatechange=function()
-			    {
-			        if (ajax.readyState==4&&ajax.status==200)
-			        {
-					    if(load==true)
-					    {
-			                document.getElementById(elementID).innerHTML=ajax.responseText;
-							if (callback) { callback(); }
-					    }
-					    else
-					    {
-					        console.log('Posted to server',ajax.responseText);
-					    }
-			        }
-			    };
-			    if (post==false)
-			    {
-			        throw "Error: this ajax should only be run with POST";
-			    }
-			    else
-			    {
-			        ajax.open("POST",filename,true);
-			        ajax.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-			        ajax.send(str);
-			    }
-			    return ajax;
-			}
-
-			function ajax(elementID,filename,str,post,load,callback)
-			{
-				var rd, percentages;
-				rd = -1;
-
 				$.ajax({    //create an ajax request to display.php
 				type: "POST",
 				url: filename,
@@ -209,39 +158,28 @@
 				dataType: "JSON",   //expect json to be returned                
 				success: function(response)
 				{
-					console.log(response);
+				    console.log(response);
 
 				    if(load==true)
 				    {
-						rd  = response[0];
-						percentages  = response[1];
-
-						if (rd == 'control') { rd = 0; }
-						else if (rd == 'treatment')
-						{
-							rd = 1;
-							document.getElementById(elementID).innerHTML=percentages;
-						}
-						else { throw "Error: 'rd' is not 'control' nor 'treatment'"; } 
-
-						if (callback) { callback(); }
+					round = response['round'];
+					if (round == 'treatment') { soc_infos = eval(response['percentages']) };
+					if (callback) { callback(); }
 				    }
 				    else
 				    {
 				        console.log('Posted to server',response);
 				    }
-				}
-				return rd;
+				} });
 			}
-			
+
 			function save_email()
 			{
 				filename='db/save_functions.php'
-				elementID=''
 				email = document.getElementById("email").value;
 				params_str = 'user_id=' + user_id + '&section='+ 'email_' + round + '&payload=' + email
-				post=true;
-				ax = ajax(elementID, filename, params_str, post, false, false);
+				load = false
+				ax = ajax(filename, params_str, load, false);
 			}
 
 			function loadnextvasq()
@@ -323,7 +261,6 @@
 			function loadscreen(screen)
 			{
 				is_question = false;
-				$("#hiddenparagraph").hide();
 				$("#qtext").text(screen["qtext"]);
 				$("#qtext2").text(screen["qtext2"]);
 				$("#qtext3").text(screen["qtext3"]);
@@ -544,11 +481,10 @@
 				}
 				console.log(ypositions)
 
-				elementID=''
 				filename='db/save_functions.php'
 				params_str = 'user_id=' + user_id + '&section='+ 'rankings_' + round + '&payload=' + JSON.stringify(ypositions)
-				post=true;
-				ax = ajax(elementID, filename, params_str, post, false, false);
+				load = true;
+				ajax(filename, params_str, load, false);
 			}
 
 
@@ -556,30 +492,27 @@
 			{
 				console.log("Saving questions")
 
-				elementID=''
 				filename='db/save_functions.php'
 				params_str = 'user_id=' + user_id + '&section='+ section + '&payload=' + JSON.stringify(questions)
 				post=true;
-				ax = ajax(elementID, filename, params_str, post, false, false);
+				ajax(filename, params_str, load, false);
 				
 			}
 
 			function load_socinfo_from_server()
 			{
+				console.log('round =',round);
 				if (include_social_info)
 				{
 					console.log("Loading social information from server for user", user_id)
 
-					elementID='soc_info_values'
 					filename='db/load_functions.php'
 					params_str = 'user_id=' + user_id 
-					post=true;
 					load=true;
 
 					function callback()
 					{
-						soc_infos = eval(document.getElementById('soc_info_values').innerHTML);
-						soc_infos = eval(soc_infos);
+						console.log("soc_infos =",soc_infos);
 						
 						// and here add it to the questions
 						
@@ -600,7 +533,7 @@
 							i++;
 						}
 					}
-					const ax = ajax(elementID, filename, params_str, post, load, callback);
+					ajax(filename, params_str, load, callback);
 				}
 			}            
 
@@ -882,7 +815,6 @@
 		Before you agree to participate, you can read all the necessary information about the nature of the study, including usage and protection of your data, <a href="files/participant_information_sheet.pdf"><u>here</u></a>. 
 		<br><br>
 		Please click if you agree to participate.</p>
-		<p id="hiddenparagraph"><span id="soc_info_values"></span></p>
 		
 
 		<div class="vas">

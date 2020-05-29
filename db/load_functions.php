@@ -16,7 +16,7 @@ function dbloader ($userid)
 
 	// bind parameters and execute
 
-	$stmt = $conn->prepare("SELECT percentages FROM socinfo WHERE userid = ?");
+	$stmt = $conn->prepare("SELECT round,percentages FROM socinfo WHERE userid = ?");
 
 	$stmt->bind_param('s', $userid);
 
@@ -26,10 +26,11 @@ function dbloader ($userid)
 		throw new Exception('{"error": "Execute failed: (' . $stmt->errno . ') ' . $stmt->error . '"}');
 	}
 
-	$stmt->bind_result($percentages);
+	$stmt->bind_result($round,$percentages);
 	$stmt->fetch();
 
-	$output=$percentages;
+	$output['round']=$round;
+	$output['percentages']=$percentages;
 
 	$stmt->close();
 	$conn->close();
