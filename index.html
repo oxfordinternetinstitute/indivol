@@ -117,7 +117,7 @@
 							questions_survey[idx]["reaction_time"]=time_end();
 
 							console.log("Survey question index", idx)
-							console.log(questions_survey[idx]['qtext'], v)
+							console.log(questions_survey[idx]['qtext2'], v)
 
 							// Reset value (for some reason it requires that)
 							$("#vas_value").val("NA")
@@ -405,7 +405,7 @@
 
 				questions.push({id:id++, qtext:".",
 					qtext2:"", color_qtext:"#00000000",
-					qtext3:"For this question, please mark Strongly disagree",
+					qtext3:"For this question, please mark Strongly disagree.",
 					label1:"Strongly agree",label2:"Strongly disagree"});
 
 				return questions;
@@ -434,7 +434,7 @@
 				{
 					var q=raw_questions[question_indices[i]];
 
-					questions.push({id:id++, qtext:"",// qtext:"A recent poll shows 10% of British people agree with this statement.",
+					questions.push({id:id++, qtext:"",
 							qtext2:q, color_qtext:"#000000FF",
 							qtext3:"How much do you agree?",
 							label1:"Strongly agree", label2:"Strongly disagree"});
@@ -448,8 +448,8 @@
 				while( i < (raw_questions.length + final_questions.length) )
 				{
 					questions.push({id:questions.length,
-						qtext:final_questions[i-raw_questions.length],
-						qtext2:"", color_qtext:"#000000FF",
+						qtext2:final_questions[i-raw_questions.length],
+						qtext:"", color_qtext:"#000000FF",
 						qtext3:"How much do you agree?",
 						label1:"Strongly agree",label2:"Strongly disagree"})
 
@@ -548,14 +548,14 @@
 						
 						for( var i=0; i < (raw_questions.length); i++ )
 						{
-							soc_info_text = "A recent poll shows "+soc_infos[question_indices[i]]+"% of British people agree with this statement:"
+							soc_info_text = "A recent poll shows "+soc_infos[question_indices[i]]+"% of British people agree with this statement."
 							
 							questions_survey[i]['qtext']   = soc_info_text;
 							questions_survey[i]['soc_info'] = soc_infos[question_indices[i]];
 						}
 						while( i < questions_survey.length )
 						{
-							soc_info_text = "A recent poll shows "+soc_infos[i]+"% of British people agree with this statement:"
+							soc_info_text = "A recent poll shows "+soc_infos[i]+"% of British people agree with this statement."
 						
 							questions_survey[i]['qtext']   = soc_info_text;
 							questions_survey[i]['soc_info'] = soc_infos[i];
@@ -617,7 +617,7 @@
 			var current_screen = -1;
 
 			// for debugging
-			current_screen = 13;
+			//current_screen = 10;
 
 			var first_screen = { qtext:"", qtext2:"", qtext3:"Public opinion study", color_qtext:'#000000'}
 			var pre_test_screen = { qtext:"First, let's practice with two test questions.", qtext2:"", qtext3:"", color_qtext:'#000000FF'}
