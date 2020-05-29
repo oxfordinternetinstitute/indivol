@@ -11,6 +11,7 @@ DEFAULT CHARACTER SET = utf8;
 
 CREATE TABLE IF NOT EXISTS `surveys`.`socinfo` (
   `userid` VARCHAR(45) NOT NULL COMMENT '',
+  `round` VARCHAR(10) NOT NULL COMMENT '',
   `percentages` json NULL COMMENT '',
   INDEX `user_section` (`userid` ASC)  COMMENT '');
 ENGINE = InnoDB;

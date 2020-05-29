@@ -95,7 +95,6 @@ N = len(users)
 #---------------------------------------#
 
 import os.path
-import json
 
 # 2a - Get number of hashes already used
 
@@ -125,9 +124,14 @@ print(old_to_new_userids)
 
 # 2c - Save old_to_new_userids dictionary
 
-outfile = 'old_to_new_userids.json'
-with open(outfile,'w') as f:
-    json.dump(old_to_new_userids, f)
+output_str = ''
+for old_id in userids:
+    new_id = old_to_new_userids[old_id]
+    output_str += str(old_id)+','+str(new_id)+'\n'
+
+outfile = 'old_to_new_userids.csv'
+with open(outfile,'a') as f:
+    f.write(s)
 
 # 2d - Update the number of hashes used
 
@@ -150,7 +154,7 @@ from email.mime.text import MIMEText
 
 email_message = 'Dear Recipient,\n\nI hope you are doing well.\n\nBest wishes,\nSender'
 email_subject = 'Testing'
-email_from    = "chico.camargo@oii.ox.ac.uk"
+email_from    = "oxlab@oii.ox.ac.uk"
 email_to      = "chico.camargo@gmail.com"
 
 for userid,email in zip(userids,emails):

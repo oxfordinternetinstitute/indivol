@@ -149,7 +149,7 @@
 				loadnextvasq();
 			});
 
-			function ajax(elementID,filename,str,post,load,callback)
+			function ajax2(elementID,filename,str,post,load,callback)
 			{
 			    var ajax;
 			    if (window.XMLHttpRequest)
@@ -175,8 +175,8 @@
 			        {
 					    if(load==true)
 					    {
-				                document.getElementById(elementID).innerHTML=ajax.responseText;
-						if (callback) { callback(); }
+			                document.getElementById(elementID).innerHTML=ajax.responseText;
+							if (callback) { callback(); }
 					    }
 					    else
 					    {
@@ -195,6 +195,43 @@
 			        ajax.send(str);
 			    }
 			    return ajax;
+			}
+
+			function ajax(elementID,filename,str,post,load,callback)
+			{
+				var rd, percentages;
+				rd = -1;
+
+				$.ajax({    //create an ajax request to display.php
+				type: "POST",
+				url: filename,
+				data: str,
+				dataType: "JSON",   //expect json to be returned                
+				success: function(response)
+				{
+					console.log(response);
+
+				    if(load==true)
+				    {
+						rd  = response[0];
+						percentages  = response[1];
+
+						if (rd == 'control') { rd = 0; }
+						else if (rd == 'treatment')
+						{
+							rd = 1;
+							document.getElementById(elementID).innerHTML=percentages;
+						}
+						else { throw "Error: 'rd' is not 'control' nor 'treatment'"; } 
+
+						if (callback) { callback(); }
+				    }
+				    else
+				    {
+				        console.log('Posted to server',response);
+				    }
+				}
+				return rd;
 			}
 			
 			function save_email()
