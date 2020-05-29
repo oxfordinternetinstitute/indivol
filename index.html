@@ -10,7 +10,6 @@
 		<script src = "https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
 		<script src="js/jquery.ui.touch-punch.min.js"></script>
 		<script src="js/mobile-check.js"></script>
-		<script src="js/hashes.js"></script>
 
 		<link rel="shortcut icon" type="image/ico" href="images/favicon.ico">
 
@@ -156,15 +155,17 @@
 				url: filename,
 				data: str,
 				dataType: "JSON",   //expect json to be returned                
+
 				success: function(response)
 				{
-				    console.log(response);
-
 				    if(load==true)
 				    {
-					round = response['round'];
-					if (round == 'treatment') { soc_infos = eval(response['percentages']) };
-					if (callback) { callback(); }
+					if( response['round'] != null )
+					{
+						round = 'wave2_'+response['round'];
+						if (round == 'wave2_treatment') { soc_infos = eval(response['percentages']); }
+						if (callback) { callback(); }
+					}
 				    }
 				    else
 				    {
@@ -501,61 +502,39 @@
 
 			function load_socinfo_from_server()
 			{
-				console.log('round =',round);
-				if (include_social_info)
+				console.log("Loading information from server for user", user_id)
+
+				filename='db/load_functions.php'
+				params_str = 'user_id=' + user_id 
+				load=true;
+
+				function callback()
 				{
-					console.log("Loading social information from server for user", user_id)
-
-					filename='db/load_functions.php'
-					params_str = 'user_id=' + user_id 
-					load=true;
-
-					function callback()
+					if( round == 'wave2_treatment' )
 					{
 						console.log("soc_infos =",soc_infos);
-						
+					
 						// and here add it to the questions
 						
 						for( var i=0; i < (raw_questions.length); i++ )
 						{
 							soc_info_text = "A recent poll shows "+soc_infos[question_indices[i]]+"% of British people agree with this statement."
-							
+						
 							questions_survey[i]['qtext']   = soc_info_text;
 							questions_survey[i]['soc_info'] = soc_infos[question_indices[i]];
 						}
 						while( i < questions_survey.length )
 						{
 							soc_info_text = "A recent poll shows "+soc_infos[i]+"% of British people agree with this statement."
-						
+					
 							questions_survey[i]['qtext']   = soc_info_text;
 							questions_survey[i]['soc_info'] = soc_infos[i];
-
 							i++;
 						}
 					}
-					ajax(filename, params_str, load, callback);
 				}
+				ajax(filename, params_str, load, callback);
 			}            
-
-			function which_list(user_id)
-			{
-				// instead of loading a list of all the user_ids, load a list of all their hashes,
-				// then hash the user_id and see if it matches one of the lists.
-				var user_list;
-				var in_control_list   = check_list(user_id, 'control');
-				var in_treatment_list = check_list(user_id, 'treatment');
-
-				if ( in_control_list )
-				{
-					user_list = 'control';
-				}
-				else if ( in_treatment_list )
-				{
-					user_list = 'treatment';
-				}
-				else user_list = 'neither';
-				return user_list;
-			}
 
 			function make_user_id(length)
 			{
@@ -575,12 +554,11 @@
 			const urlParams = new URLSearchParams(queryString);
 			var user_id = urlParams.get('id');
 
-			var round;
+			var round = 'wave1';
 			var is_question;
 			var idx_test_q, idx_survey_q, idx_personality_q;
 			var question_indices;
 
-			var include_social_info; // false for the first wave and for control, true for the second wave (treatment group)
 			var soc_infos;
 
 
@@ -621,7 +599,6 @@
 				}
 
 				round = 'wave1';
-				include_social_info = false;
 				window.location.href = url;	
 
 				// or, when this page should not be run without an user ID
@@ -631,30 +608,6 @@
 				$("#paragraph").hide();
 				$("#next").hide();*/
 			}
-			else
-			{
-				var user_list = which_list(user_id);
-
-				if ( user_list == 'control')
-				{
-					round = 'wave2_control';
-					include_social_info = false;
-				}
-				else if ( user_list == 'treatment' )
-				{
-					round = 'wave2_treatment';
-					include_social_info = true;
-				}
-				else // when the ID isn't anywhere, default to round 1
-				{
-					round = 'wave1';
-					include_social_info = false;
-				}
-			}
-			
-			//for debugging
-			//round = 'wave2_treatment';
-			//include_social_info=true;
 
 			// Load questions
 			var raw_questions;
@@ -665,10 +618,6 @@
 			var questions_test        = init_questions_test();
 			var len_test              = questions_test.length;
 			var final_questions;
-
-			console.log('Wave:',round)
-			console.log('Include social info:',include_social_info);
-			console.log(questions_survey);
 
 			// Load first screen
 			loadnextvasq();
