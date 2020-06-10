@@ -1,12 +1,10 @@
 .draggabledot {
-  color: white;
   font-family: 'Work Sans', sans-serif;
   font-size: 120%;
   padding: 10px;
   position: absolute;
   z-index: 9;
   cursor: move;
-  background-color: #dadada;
   text-align: center;
   color: #000;
   -moz-border-radius: 50%;
