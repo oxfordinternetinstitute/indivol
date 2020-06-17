@@ -152,10 +152,24 @@ print('Number of userids used so far updated to', n_hashes_used)
 import smtplib
 from email.mime.text import MIMEText
 
-email_message = 'Dear Recipient,\n\nI hope you are doing well.\n\nBest wishes,\nSender'
-email_subject = 'Testing'
-email_from    = "oxlab@oii.ox.ac.uk"
-email_to      = "chico.camargo@gmail.com"
+email_message = """Dear Participant, 
+
+Thank you again for participating in our study on public opinion. We very much appreciate your time!
+
+Today is the time to complete the second session of our study (5-10 minutes long). Please follow the link below to do so:
+
+https://surveys.oii.ox.ac.uk/?id={}
+
+Once you complete this second session you will receive your £5 Amazon Voucher. 
+
+Once again thank you for your time and participation. 
+
+Myrto Pantazi (on behalf of the research team), 
+
+Oxford Internet Institute
+41 St Giles’, OX1 3LW
+University tel: 01865 287210
+University email: oxlab@oii.ox.ac.uk"""
 
 for userid,email in zip(userids,emails):
     userid2 = str(old_to_new_userids[userid])
@@ -163,10 +177,11 @@ for userid,email in zip(userids,emails):
 
 print('Sending email to '+email_to)
 
-msg = MIMEText(email_message)
-msg['Subject'] = email_subject
-msg['From']    = email_from 
+email_text = email_message.format(userid2)
+msg = MIMEText(email_text)
 msg['To']      = email_to
+msg['From']    = "oxlab@oii.ox.ac.uk" 
+msg['Subject'] = "Public opinion study - second session"
 
 s = smtplib.SMTP("smtp.ox.ac.uk")
 s.sendmail(email_from, email_to, msg.as_string())

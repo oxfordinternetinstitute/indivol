@@ -162,12 +162,12 @@
 				{
 				    if(load==true)
 				    {
-					if( response['round'] != null )
-					{
-						round = 'wave2_'+response['round'];
-						if (round == 'wave2_treatment') { soc_infos = eval(response['percentages']); }
-						if (callback) { callback(); }
-					}
+						if( response['round'] != null )
+						{
+							round = 'wave2_'+response['round'];
+							if (round == 'wave2_treatment') { soc_infos = eval(response['percentages']); }
+							if (callback) { callback(); }
+						}
 				    }
 				    else
 				    {
@@ -183,6 +183,23 @@
 				params_str = 'user_id=' + user_id + '&section='+ 'email_' + round + '&payload=' + email
 				load = false
 				ax = ajax(filename, params_str, load, false);
+			}
+
+			function send_email()
+			{
+				if( round == 'wave1' )
+				{
+					email = document.getElementById("email").value;
+					params_str = 'email=' + email,
+					$.ajax({
+					   data: params_str,
+					   url: "save_emails_wave1.py",
+					   success: function(response) {
+					   	 console.log(response)
+					   	 console.log("Sent email to",email)
+					   }
+					});				
+				}
 			}
 
 			function loadnextvasq()
@@ -254,6 +271,7 @@
 				else
 				{
 					save_email();
+					send_email();
 					loadscreen(final_screen) 
 				}
 				current_screen++;
