@@ -45,6 +45,8 @@ mySql_insert_query += "AND (datetime < {}) AND (datetime >= {});"
 #mySql_insert_query = mySql_insert_query.format(yesterday,two_days_ago)
 mySql_insert_query = mySql_insert_query.format(1589816930,1589811030)
 
+print('Date:')
+print(today)
 print('Submitting query: '+mySql_insert_query)
 
 
