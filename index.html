@@ -523,6 +523,7 @@
 
 				function callback()
 				{
+					console.log("here!")
 					if( round == 'wave2_treatment' )
 					{
 						console.log("soc_infos =",soc_infos);
@@ -544,8 +545,27 @@
 							questions_survey[i]['soc_info'] = soc_infos[i];
 							i++;
 						}
+
+						final_qs = [ "I think my views were influenced by the information presented.",
+						  		     "I think other people's views will be influenced by the information presented.",
+								     "I identify with the average UK citizen."];
 					}
+					else
+					{
+						final_qs = [ "I identify with the average UK citizen."];
+					}
+
+					// Add final questions
+					for (var i=0; i<final_qs.length; i++)
+					{
+						var q=final_qs[i];
+						questions_personality.push({id:id++, qtext2:"", color_qtext:"#000000FF",
+													qtext:q, qtext3:"How much do you agree?",
+													label1:"Strongly agree",label2:"Strongly disagree"});
+					}								     
+
 				}
+
 				ajax(filename, params_str, load, callback);
 			}            
 
@@ -571,6 +591,7 @@
 			var is_question;
 			var idx_test_q, idx_survey_q, idx_personality_q;
 			var question_indices;
+			var final_qs;
 
 			var soc_infos;
 
@@ -578,7 +599,7 @@
 			var current_screen = -1;
 
 			// for debugging
-			current_screen = 12;
+			current_screen = 25;
 
 			var first_screen = { qtext:"", qtext2:"", qtext3:"Public opinion study", color_qtext:'#000000'}
 			var pre_test_screen = { qtext:"First, let's practice with two test questions.", qtext2:"", qtext3:"", color_qtext:'#000000FF'}
