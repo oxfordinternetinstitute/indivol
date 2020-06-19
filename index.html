@@ -152,12 +152,11 @@
 
 			function ajax(filename,str,load,callback)
 			{
-				$.ajax({    //create an ajax request to display.php
+				$.ajax({ 
 				type: "POST",
 				url: filename,
 				data: str,
 				dataType: "JSON",   //expect json to be returned                
-
 				success: function(response)
 				{
 				    if(load==true)
@@ -171,7 +170,7 @@
 				    }
 				    else
 				    {
-				        console.log('Posted to server',response);
+				        console.log('POST:',response);
 				    }
 				} });
 			}
@@ -185,23 +184,6 @@
 				ax = ajax(filename, params_str, load, false);
 			}
 
-			function send_email()
-			{
-				console.log("Current round is",round);
-				if( round == 'wave1' )
-				{
-					email = document.getElementById("email").value;
-					params_str = 'email=' + email,
-					$.ajax({
-					   data: params_str,
-					   url: "send_emails_wave1.py",
-					   success: function(response) {
-					   	 console.log(response)
-					   	 console.log("Sent email to",email)
-					   }
-					});				
-				}
-			}
 
 			function loadnextvasq()
 			{
@@ -271,9 +253,7 @@
 				}
 				else
 				{
-					console.log(current_screen, len_test, len_survey, len_personality, 4+len_test+len_survey+len_personality);
 					save_email();
-					send_email();
 					loadscreen(final_screen) 
 				}
 				current_screen++;
@@ -620,7 +600,7 @@
 			var current_screen = -1;
 
 			// for debugging
-			//current_screen = 25;
+			current_screen = 25;
 
 			var first_screen = { qtext:"", qtext2:"", qtext3:"Public opinion study", color_qtext:'#000000'}
 			var pre_test_screen = { qtext:"First, let's practice with two test questions.", qtext2:"", qtext3:"", color_qtext:'#000000FF'}

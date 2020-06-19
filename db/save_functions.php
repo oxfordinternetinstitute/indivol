@@ -32,6 +32,12 @@ function dblogger ($userid, $section, $payload, $datetime)
 	return true;
 }
 
+function send_email($email)
+{
+	$cmd="python /home/math0818/www/send_emails_wave1.py " . $email;
+	shell_exec($cmd);
+	return $cmd;
+}
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') 
 {
@@ -46,6 +52,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
 	$datetime=$datetime->getTimestamp();
 
 	dblogger($userid,$section,$payload,$datetime);
+
+	$output=$section;
+	if ($section == "email_wave1")
+	{
+		send_email($payload);
+		$output="email saved and sent";
+	}
+	echo json_encode($output);
 
 }
 
