@@ -179,6 +179,7 @@
 			{
 				filename='db/save_functions.php'
 				email = document.getElementById("email").value;
+                                email = email.replace(/\s/g, '');
 				params_str = 'user_id=' + user_id + '&section='+ 'email_' + round + '&payload=' + email
 				load = false
 				ax = ajax(filename, params_str, load, false);
