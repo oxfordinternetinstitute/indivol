@@ -180,7 +180,7 @@ for userid,email in zip(userids,emails):
 print('Sending email to '+email_to)
 
 email_text = email_message.format(userid2)
-msg = MIMEText(email_text)
+msg = MIMEText(email_text, 'plain', 'utf-8')
 msg['To']      = email_to
 msg['From']    = "oxlab@oii.ox.ac.uk" 
 msg['Subject'] = "Public opinion study - second session"
