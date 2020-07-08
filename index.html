@@ -14,19 +14,6 @@
 		<link rel="shortcut icon" type="image/ico" href="images/favicon.ico">
 
 		<script language="javascript">
-
-		function filter_email (email) {
-		   var
-		      /* Define the recommended regular expression. */
-		      emailExp = new RegExp(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\b/i),
-
-		      /* Use 'match' to filter the email address given and cache the result. */
-		      filtered = email.match(emailExp);
-
-		   /* Return the filtered value or false. */
-		   return filtered ? filtered[0] : false;
-		}
-
 		$(function(){
 			$(".vas-scale").on('mousedown', function(e)
 			{
@@ -146,24 +133,7 @@
 							// Reset value (for some reason it requires that)
 							$("#vas_value").val("NA")
 						}					
-					}
-					
-					console.log(current_screen, 4+len_test+len_survey+len_personality)
-					if(current_screen == (5 + len_test + len_survey + len_personality))
-					{
-						email = document.getElementById("email").value;
-						if( filter_email(email)==false )
-						{
-							console.log('Empty email')
-							document.getElementById("email").value = 'Fill email here'
-							return false;
-						}						
-						else
-						{
-							console.log('Real email:',email)
-						}
-					}
-					
+					}		
 				}
 
 				timeDiff  = time_end();
@@ -209,7 +179,7 @@
 			{
 				filename='db/save_functions.php'
 				email = document.getElementById("email").value;
-				email = email.replace(/\s/g, '');
+                                email = email.replace(/\s/g, '');
 				params_str = 'user_id=' + user_id + '&section='+ 'email_' + round + '&payload=' + email
 				load = false
 				ax = ajax(filename, params_str, load, false);
@@ -631,7 +601,7 @@
 			var current_screen = -1;
 
 			// for debugging
-			current_screen = 25;
+			//current_screen = 25;
 
 			var first_screen = { qtext:"", qtext2:"", qtext3:"Public opinion study", color_qtext:'#000000'}
 			var pre_test_screen = { qtext:"First, let's practice with two test questions.", qtext2:"", qtext3:"", color_qtext:'#000000FF'}
