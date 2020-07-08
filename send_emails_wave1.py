@@ -35,3 +35,5 @@ University email: oxlab@oii.ox.ac.uk"""
 	s.sendmail(email_from, email_to, msg.as_string())
 	s.quit()
 
+	with open('log_emails_wave1.txt','a') as f:
+		f.write('Sent email to {}\n'.format(email_to))

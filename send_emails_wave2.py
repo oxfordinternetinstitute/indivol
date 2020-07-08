@@ -1,3 +1,5 @@
+# -*- coding: UTF-8 -*-
+
 from auth import Auth
 import mysql.connector
 from mysql.connector import Error
@@ -42,8 +44,7 @@ except AttributeError:
 mySql_insert_query  = "SELECT * FROM logging WHERE (SECTION LIKE 'email%') "
 mySql_insert_query += "AND (datetime < {}) AND (datetime >= {});"
 
-#mySql_insert_query = mySql_insert_query.format(yesterday,two_days_ago)
-mySql_insert_query = mySql_insert_query.format(1589816930,1589811030)
+mySql_insert_query = mySql_insert_query.format(yesterday,two_days_ago)
 
 print('Date:')
 print(today)
@@ -133,7 +134,7 @@ for old_id in userids:
 
 outfile = 'old_to_new_userids.csv'
 with open(outfile,'a') as f:
-    f.write(s)
+    f.write(output_str)
 
 # 2d - Update the number of hashes used
 
@@ -169,25 +170,25 @@ Once again thank you for your time and participation.
 Myrto Pantazi (on behalf of the research team), 
 
 Oxford Internet Institute
-41 St Giles’, OX1 3LW
-University tel: 01865 287210
+41 St Giles', OX1 3LW
+University phone: 01865 287210
 University email: oxlab@oii.ox.ac.uk"""
+
+s = smtplib.SMTP("smtp.ox.ac.uk")
 
 for userid,email in zip(userids,emails):
     userid2 = str(old_to_new_userids[userid])
-    print 'Send email to '+userid+' at email '+email+' with link containing '+userid2
+    print 'Sending email to '+userid+' at email '+email+' with link containing '+userid2
 
-print('Sending email to '+email_to)
+    email_text = email_message.format(userid2)
+    msg = MIMEText(email_text, 'plain', 'utf-8')
+    msg['To']      = email_to
+    msg['From']    = "oxlab@oii.ox.ac.uk" 
+    msg['Subject'] = "Public opinion study - second session"
+    s.sendmail(email_from, email_to, msg.as_string())
 
-email_text = email_message.format(userid2)
-msg = MIMEText(email_text)
-msg['To']      = email_to
-msg['From']    = "oxlab@oii.ox.ac.uk" 
-msg['Subject'] = "Public opinion study - second session"
+    print("Email sent")
 
-s = smtplib.SMTP("smtp.ox.ac.uk")
-s.sendmail(email_from, email_to, msg.as_string())
 s.quit()
 
-print('Email sent')
 
