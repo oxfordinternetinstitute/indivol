@@ -155,7 +155,10 @@
 						if( filter_email(email)==false )
 						{
 							console.log('Empty email')
-							document.getElementById("email").value = 'Fill email here'
+							document.getElementById("email").value = ''
+							document.getElementById("email").placeholder = 'Fill email here'
+							document.getElementById("email").style.backgroundColor = '#FFF666';
+
 							return false;
 						}						
 						else
