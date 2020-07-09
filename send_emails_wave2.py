@@ -175,15 +175,16 @@ University phone: 01865 287210
 University email: oxlab@oii.ox.ac.uk"""
 
 s = smtplib.SMTP("smtp.ox.ac.uk")
+email_from = "oxlab@oii.ox.ac.uk" 
 
-for userid,email in zip(userids,emails):
+for userid,email_to in zip(userids,emails):
     userid2 = str(old_to_new_userids[userid])
     print 'Sending email to '+userid+' at email '+email+' with link containing '+userid2
 
     email_text = email_message.format(userid2)
     msg = MIMEText(email_text, 'plain', 'utf-8')
     msg['To']      = email_to
-    msg['From']    = "oxlab@oii.ox.ac.uk" 
+    msg['From']    = email_from
     msg['Subject'] = "Public opinion study - second session"
     s.sendmail(email_from, email_to, msg.as_string())
 
