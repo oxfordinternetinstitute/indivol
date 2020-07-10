@@ -41,7 +41,8 @@ except AttributeError:
 
 
 # prepare query string
-mySql_insert_query  = "SELECT * FROM logging WHERE (SECTION LIKE 'email%') "
+mySql_insert_query  = "SELECT * FROM logging WHERE (section='email_wave1') "
+mySql_insert_query += "AND (payload!='') "
 mySql_insert_query += "AND (datetime < {}) AND (datetime >= {});"
 
 mySql_insert_query = mySql_insert_query.format(yesterday,two_days_ago)
@@ -79,6 +80,7 @@ for i in result:
     user  = i[0]
     email = i[2]
     users[user] = email
+    print('users[{}] = {}'.format(user,email))
 
 userids = []
 emails  = []
