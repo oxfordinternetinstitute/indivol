@@ -181,7 +181,7 @@ email_from = "oxlab@oii.ox.ac.uk"
 
 for userid,email_to in zip(userids,emails):
     userid2 = str(old_to_new_userids[userid])
-    print 'Sending email to '+userid+' at email '+email+' with link containing '+userid2
+    print 'Sending email to '+userid+' at email '+email_to+' with link containing '+userid2
 
     email_text = email_message.format(userid2)
     msg = MIMEText(email_text, 'plain', 'utf-8')
