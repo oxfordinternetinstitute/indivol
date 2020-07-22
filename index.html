@@ -280,14 +280,17 @@
 							 questions_personality[idx_personality_q]["color_qtext"],
 							 questions_personality[idx_personality_q]["label1"],
 							 questions_personality[idx_personality_q]["label2"]);
-				}				
+				}	
+				/*			
 				else if ( current_screen == (4 + len_test + len_survey + len_personality) )
 				{
 					loadscreen(thankyou_screen)
 				}
+				*/
 				else
 				{
-					save_email();
+					// no need for email now
+					//save_email();
 					loadscreen(final_screen) 
 				}
 				current_screen++;
@@ -354,6 +357,13 @@
 					}
 					case final_screen:
 					{
+						// Now that the thankyou_screen is not, shown different messages here
+						if( round == "wave1" )
+						{
+							$("#qtext").text("In two days, we will send you an email with the link to the second session of the survey. We will use your email for no other purposes other than to contact you in regard to this survey and will delete it after you participate or after 90 days, whichever comes first.");
+							$("#qtext3").text("You can close this window now.");
+						}
+
 						$("#next").hide();
 						break;
 					}
@@ -645,7 +655,7 @@
 			var ranking_screen = { qtext:"", qtext2:"Now, regardless of your opinion, please sort the same issues on the line, from most important (top) to least important (bottom).", qtext3:"", color_qtext:'#000000FF'}
 			var pre_personality_screen = { qtext:"We will now ask you a series of questions about yourself.", qtext2:"", qtext3:"", color_qtext:'#000000FF'}
 			var thankyou_screen = { qtext:"To participate in the next session, please enter your email below. We will use your email for no other purposes other than to contact you in regard to this survey and will delete it after you participate or after 90 days, whichever comes first.", qtext2:"Thank you for participating!", qtext3:"To complete the second session of this study, please enter your email below.", color_qtext:'#000000'}
-			var final_screen = { qtext: "", qtext2:"You can close this page now.", qtext3:"", color_qtext:'#000000'}
+			var final_screen = { qtext: "You can close this page now.", qtext2:"Thank you for participating!", qtext3:"", color_qtext:'#000000'}
 
 			var isMobile = window.mobileCheck();
 			if( !isMobile )
