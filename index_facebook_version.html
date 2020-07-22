@@ -1,0 +1,861 @@
+<html>
+<?php include("db/save_functions.php")?>
+<?php include("db/load_functions.php")?>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<head>
+		<script src="js/jquery-3.4.1.js"></script>
+		<link  href = "https://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css" rel = "stylesheet">
+		<script src = "https://code.jquery.com/jquery-1.10.2.js"></script>
+		<script src = "https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+		<script src="js/jquery.ui.touch-punch.min.js"></script>
+		<script src="js/mobile-check.js"></script>
+
+		<link rel="shortcut icon" type="image/ico" href="images/favicon.ico">
+
+		<script language="javascript">
+
+		function filter_email (email) {
+		   var
+		      /* Define the recommended regular expression. */
+		      emailExp = new RegExp(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\b/i),
+
+		      /* Use 'match' to filter the email address given and cache the result. */
+		      filtered = email.match(emailExp);
+
+		   /* Return the filtered value or false. */
+		   return filtered ? filtered[0] : false;
+		}
+
+		$(function(){
+			$(".vas-scale").on('mousedown', function(e)
+			{
+				rect = document.getElementById("vas-line").getBoundingClientRect()
+				minTopPosition = rect.top - 3;
+				maxTopPosition = rect.bottom - 15;
+
+				$("#vas_dot").draggable({
+					  axis: "y",
+					  cursor: "move",
+					  drag: function(event, ui){
+					    var topPosition = ui.position.top;
+					    if (topPosition < minTopPosition)
+					    	{ ui.position.top = minTopPosition; }
+					    if (topPosition > maxTopPosition)
+					    	{ ui.position.top = maxTopPosition; }
+
+						var val=ui.position.top;
+						$("#vas_value").val(val);
+					  }
+					});
+
+			}).on('mouseup', function(e) {
+
+				var posY = $(this).offset().top;
+				//var val=e.pageY - posY;
+				//$("#vas_dot").show().css({"top":e.pageY-8});
+
+				var val=e.pageY-8;				
+				$("#vas_dot").show().css({"top":val});
+				$("#vas_value").val(val);
+			});
+
+			$(".next").click(function(e)
+			{
+				rect = document.getElementById("vas-line").getBoundingClientRect()
+				minTopPosition = rect.top - 3;
+				maxTopPosition = rect.bottom - 15;
+
+				// Check if the user is pressing the Back button
+				if( $(this).attr('id') == 'back' )
+				{
+					current_screen = current_screen - 2;
+				}
+				else // the "else" condition is the Next button
+				{
+					if( is_question ) 
+					{
+						var v=$("#vas_value").val();
+						if( v == "NA")
+						{
+							return false;
+						}
+						if( idx_test_q == 0 ) // first test question
+						{
+							console.log('Answering first test q:', v)
+							if( v > minTopPosition+10 )
+							{
+								// make the question text red
+								document.getElementById("qtext3").style.color = '#FF0000';
+
+								// make the question text bold
+								//document.getElementById("qtext").style.fontWeight = "900";
+
+								return false;
+							}
+							else
+							{
+								// make the question text black
+								document.getElementById("qtext3").style.color = '#000000';
+								$("#vas_value").val("NA")
+							}
+						}
+						else if( idx_test_q == 1 ) // second test question
+						{
+							console.log('Answering second test q:', v)
+							if( v < maxTopPosition-15 )
+							{
+								// make the question text red
+								document.getElementById("qtext3").style.color = '#FF0000';
+
+								// make the question text bold
+								//document.getElementById("qtext").style.fontWeight = "900";
+								
+								return false;
+							}
+							else
+							{
+								// make the question text black
+								document.getElementById("qtext3").style.color = '#000000';
+								$("#vas_value").val("NA")
+							}
+						}					
+						else if (  idx_survey_q < len_survey )
+						{
+							var idx = idx_survey_q;
+
+							questions_survey[idx]["val"]=v;
+							questions_survey[idx]["reaction_time"]=time_end();
+
+							console.log("Survey question index", idx)
+							console.log(questions_survey[idx]['qtext2'], v)
+
+							// Reset value (for some reason it requires that)
+							$("#vas_value").val("NA")
+						}
+						else if (  idx_personality_q < len_personality )
+						{
+							var idx = idx_personality_q;
+
+							questions_personality[idx]["val"]=v;
+							questions_personality[idx]["reaction_time"]=time_end();
+
+							console.log("Personality question index", idx)
+							console.log(questions_personality[idx]['qtext'], v)
+
+							// Reset value (for some reason it requires that)
+							$("#vas_value").val("NA")
+						}					
+					}
+					
+					console.log(current_screen, 4+len_test+len_survey+len_personality)
+					if(current_screen == (5 + len_test + len_survey + len_personality))
+					{
+						email = document.getElementById("email").value;
+						if( filter_email(email)==false )
+						{
+							console.log('Empty email')
+							document.getElementById("email").value = ''
+							document.getElementById("email").placeholder = 'Fill email here'
+							document.getElementById("email").style.backgroundColor = '#FFF666';
+
+							return false;
+						}						
+						else
+						{
+							console.log('Real email:',email)
+						}
+					}
+					
+				}
+
+				timeDiff  = time_end();
+
+				if( is_question )
+				{
+					if( idx_survey_q < len_survey ) // if the user is answering the survey questions
+						save_questions(questions_survey, "questions_survey"+"_"+round); 
+					else // if the user has moved on to the personality questions
+						save_questions(questions_personality, "questions_personality"+"_"+round);
+				}
+
+				time_start();
+				loadnextvasq();
+			});
+
+			function ajax(filename,str,load,callback)
+			{
+				$.ajax({ 
+				type: "POST",
+				url: filename,
+				data: str,
+				dataType: "JSON",   //expect json to be returned                
+				success: function(response)
+				{
+				    if(load==true)
+				    {
+						if( response['round'] != null )
+						{
+							round = 'wave2_'+response['round'];
+							if (round == 'wave2_treatment') { soc_infos = eval(response['percentages']); }
+							if (callback) { callback(); }
+						}
+				    }
+				    else
+				    {
+				        console.log('POST:',response);
+				    }
+				} });
+			}
+
+			function save_email()
+			{
+				filename='db/save_functions.php'
+				email = document.getElementById("email").value;
+				email = email.replace(/\s/g, '');
+				params_str = 'user_id=' + user_id + '&section='+ 'email_' + round + '&payload=' + email
+				load = false
+				ax = ajax(filename, params_str, load, false);
+			}
+
+
+			function loadnextvasq()
+			{
+				idx_test_q        = current_screen-1;
+				idx_survey_q      = current_screen-len_test-2;
+				idx_personality_q = current_screen-len_survey-len_test-4;
+
+				if( current_screen == -1 )
+				{
+					loadscreen(first_screen)
+				}
+				else if ( current_screen == 0 )
+				{
+					console.log("loading pre test screen now")
+					loadscreen(pre_test_screen)
+				}				
+				else if ( current_screen < ( 1 + len_test ) )
+				{
+					// load test question
+					loadvasq(questions_test[idx_test_q]["qtext"],
+							 questions_test[idx_test_q]["qtext2"],
+							 questions_test[idx_test_q]["qtext3"],
+							 questions_test[idx_test_q]["color_qtext"],
+							 questions_test[idx_test_q]["label1"],
+							 questions_test[idx_test_q]["label2"]);
+				}
+				else if ( current_screen == ( 1 + len_test ) )
+				{
+					console.log("loading pre survey screen now")
+					loadscreen(pre_survey_screen)
+				}				
+				else if ( current_screen < (2 + len_test + len_survey) )
+				{
+					// load a question from the survey
+					loadvasq(questions_survey[idx_survey_q]["qtext"],
+							 questions_survey[idx_survey_q]["qtext2"],
+							 questions_survey[idx_survey_q]["qtext3"],
+							 questions_survey[idx_survey_q]["color_qtext"],
+							 questions_survey[idx_survey_q]["label1"],
+							 questions_survey[idx_survey_q]["label2"],
+							 questions_survey[idx_survey_q]["soc_info"]);
+				}
+				else if ( current_screen == (2 + len_test + len_survey) )
+				{
+					// load ranking question
+					loadscreen(ranking_screen)
+				}
+				else if ( current_screen == (3 + len_test + len_survey) )
+				{
+					save_rankings()
+					// we still need to measure the personality traits
+					loadscreen(pre_personality_screen)
+				}				
+				else if ( current_screen < (4 + len_test + len_survey + len_personality) )
+				{
+					// load a personality question
+					loadvasq(questions_personality[idx_personality_q]["qtext"],
+							 questions_personality[idx_personality_q]["qtext2"],
+							 questions_personality[idx_personality_q]["qtext3"],
+							 questions_personality[idx_personality_q]["color_qtext"],
+							 questions_personality[idx_personality_q]["label1"],
+							 questions_personality[idx_personality_q]["label2"]);
+				}				
+				else if ( current_screen == (4 + len_test + len_survey + len_personality) )
+				{
+					loadscreen(thankyou_screen)
+				}
+				else
+				{
+					save_email();
+					loadscreen(final_screen) 
+				}
+				current_screen++;
+
+			}
+
+			function loadscreen(screen)
+			{
+				is_question = false;
+				$("#qtext").text(screen["qtext"]);
+				$("#qtext2").text(screen["qtext2"]);
+				$("#qtext3").text(screen["qtext3"]);
+				document.getElementById("qtext").style.color = screen["color_qtext"];
+
+				$(".vas").hide();
+				$(".draggabledot").hide();
+				$("#next").text("Continue");
+				$("#next").css({ position: "relative"}).appendTo('body');
+				$("#back").hide();
+				$("#email").hide();
+
+				switch(screen)
+				{
+					case first_screen:
+					{
+						$("#qtext").hide();
+						$("#qtext2").hide();
+						break;
+					}
+					case pre_test_screen:
+					{
+						$("#qtext").show();
+						$("#qtext2").show();
+						$("#paragraph").hide();
+						break;
+					}
+					case pre_survey_screen:
+					{
+						$("#qtext").show();
+						$("#qtext2").show();
+						$("#qtext3").show();
+						$("#paragraph").hide();
+						break;
+					}					
+					case thankyou_screen:
+					{
+						// Make the "thank you!" bold
+						document.getElementById("qtext2").style.fontWeight = "900";
+
+						$("#next").text("Submit");
+						if( round == "wave1" )
+						{
+							$("#email").show();
+						}
+						else
+						{
+							thankyou_screen['qtext'] = "We will send your Amazon voucher to the email you have provided. We will use your email for no other purposes other than to contact you in regard to this survey and will delete it after sending you the Amazon voucher.";
+							thankyou_screen['qtext3'] = "You can close this window now.";
+							$("#qtext").text(thankyou_screen["qtext"]);
+							$("#qtext3").text(thankyou_screen["qtext3"]);
+							$("#next").hide();
+						}
+						break;
+					}
+					case final_screen:
+					{
+						$("#next").hide();
+						break;
+					}
+					case ranking_screen:
+					{
+						$("#next").css({ position: "absolute", right:'7'}).appendTo('body');
+						$(".draggablesquare").show();
+						$("#ruler").show()
+						break;
+					}
+					default:
+					{
+						$(".draggablesquare").hide();
+						$("#ruler").hide()
+					}
+				}
+			}
+
+			function loadvasq(qtext,qtext2,qtext3,color_qtext,label1="Strongly agree",label2="Strongly disagree",social_info="")
+			{
+				is_question = true;
+				$("#qtext").text(qtext);
+				$("#qtext2").text(qtext2);
+				$("#qtext3").text(qtext3);
+				document.getElementById("qtext").style.color = color_qtext;
+
+				$("#paragraph").hide();
+				$(".vas").show();
+				$("#label1").text(label1);
+				$("#label2").text(label2);
+				//$(".vas-dot").hide();
+				$("#next").text("Next");
+				$("#next").css({ position: "absolute", right:'7'}).appendTo('body');
+				$("#back").show();
+				$("#back").text("Back");
+				$("#back").css({ position: "absolute", left:'27'}).appendTo('body');
+
+				$(".draggablesquare").hide();
+				$(".draggabledot").hide();
+			}
+
+			function shuffle(array)
+			{
+				var currentIndex = array.length, temporaryValue, randomIndex;
+
+				// While there remain elements to shuffle...
+				while (0 !== currentIndex)
+				{
+
+					// Pick a remaining element...
+					randomIndex = Math.floor(Math.random() * currentIndex);
+					currentIndex -= 1;
+
+					// And swap it with the current element.
+					temporaryValue = array[currentIndex];
+					array[currentIndex] = array[randomIndex];
+					array[randomIndex] = temporaryValue;
+				}
+
+				return array;
+			}
+
+			function init_questions_test()
+			{
+				var questions=[];
+				var id=0;
+
+				// First, the test questions
+				questions.push({id:id++, qtext:".",
+					qtext2:"", color_qtext:"#00000000",
+					qtext3:"For this question, please mark Strongly agree.",
+					label1:"Strongly agree",label2:"Strongly disagree"});
+
+				questions.push({id:id++, qtext:".",
+					qtext2:"", color_qtext:"#00000000",
+					qtext3:"For this question, please mark Strongly disagree.",
+					label1:"Strongly agree",label2:"Strongly disagree"});
+
+				return questions;
+			}
+
+			function init_questions_survey(user_id, callback)
+			{
+				raw_questions=[
+					"The government should be doing more to tackle climate change.",
+					"The government should take more steps to reduce social inequality.",
+					"The government should do more to protect human rights regardless of race, religion etc.",
+					"More should be done to ensure women have equal rights to men.",
+					"It is important to ensure LGBTQ+ people have the same rights as other members of society.",
+					"The government should reduce the level of immigration into Britain.",
+					"Social media websites should not display fake news stories.",
+					"I would support action to tackle online hate speech."
+				];
+
+				question_indices = [...Array(8).keys()]
+				question_indices = shuffle(question_indices);
+
+				var questions=[];
+				var id=0;
+
+				for (var i=0; i<raw_questions.length; i++)
+				{
+					var q=raw_questions[question_indices[i]];
+
+					questions.push({id:id++, qtext:"",
+							qtext2:q, color_qtext:"#000000FF",
+							qtext3:"How much do you agree?",
+							label1:"Strongly agree", label2:"Strongly disagree"});
+				}
+
+				//These questions are always last
+
+				final_questions = ["Leaving the EU will be positive for the United Kingdom.",
+				 "During the COVID-19 crisis, the government should prioritise saving lives over protecting the economy."]
+
+				while( i < (raw_questions.length + final_questions.length) )
+				{
+					questions.push({id:questions.length,
+						qtext2:final_questions[i-raw_questions.length],
+						qtext:"", color_qtext:"#000000FF",
+						qtext3:"How much do you agree?",
+						label1:"Strongly agree",label2:"Strongly disagree"})
+
+					i++;
+				}
+
+				callback();
+
+				return questions;
+			}
+
+			function init_questions_personality()
+			{
+				var raw_qs=[
+					"extraverted, enthusiastic",
+					"critical, quarrelsome",
+					"dependable, self-disciplined",
+					"anxious, easily upset",
+					"open to new experiences, complex",
+					"reserved, quiet",
+					"sympathetic, warm",
+					"disorganized, careless",
+					"calm, emotionally stable",
+					"conventional, uncreative"
+				];
+
+				var questions=[];
+				var id=0;
+
+				for (var i=0; i<raw_qs.length; i++)
+				{
+					var q=raw_qs[i];
+					questions.push({id:id++, qtext2:"", color_qtext:"#000000FF",
+									qtext:"I see myself as "+q+".",
+									qtext3:"How much do you agree?",
+									label1:"Strongly agree",label2:"Strongly disagree"});
+				}
+
+				return questions;
+			}
+
+			function save_rankings()
+			{
+				console.log("Saving rankings now")
+				all_squares = $(".draggablesquare");
+
+				var ypositions = []
+
+				for (var i=0; i<all_squares.length; i++)
+				{
+					issue     = all_squares[i].innerText;
+					yposition = all_squares[i].style.top;
+
+					ypositions.push({ key:issue, value:yposition })
+				}
+				console.log(ypositions)
+
+				filename='db/save_functions.php'
+				params_str = 'user_id=' + user_id + '&section='+ 'rankings_' + round + '&payload=' + JSON.stringify(ypositions)
+				load = true;
+				ajax(filename, params_str, load, false);
+			}
+
+
+			function save_questions(questions, section)
+			{
+				console.log("Saving questions")
+
+				filename='db/save_functions.php'
+				params_str = 'user_id=' + user_id + '&section='+ section + '&payload=' + JSON.stringify(questions)
+				post=true;
+				ajax(filename, params_str, load, false);
+				
+			}
+
+			function load_socinfo_from_server()
+			{
+				console.log("Loading information from server for user", user_id)
+
+				filename='db/load_functions.php'
+				params_str = 'user_id=' + user_id 
+				load=true;
+
+				function callback()
+				{
+					console.log("here! round =",round)
+					if( round == 'wave2_treatment' )
+					{
+						console.log("soc_infos =",soc_infos);
+					
+						// and here add it to the questions
+						
+						for( var i=0; i < (raw_questions.length); i++ )
+						{
+							soc_info_text = "A recent poll shows "+soc_infos[question_indices[i]]+"% of British people agree with this statement."
+						
+							questions_survey[i]['qtext']   = soc_info_text;
+							questions_survey[i]['soc_info'] = soc_infos[question_indices[i]];
+						}
+						while( i < questions_survey.length )
+						{
+							soc_info_text = "A recent poll shows "+soc_infos[i]+"% of British people agree with this statement."
+					
+							questions_survey[i]['qtext']   = soc_info_text;
+							questions_survey[i]['soc_info'] = soc_infos[i];
+							i++;
+						}
+
+						final_qs = [ "I think my views were influenced by the information presented.",
+						  		     "I think other people's views will be influenced by the information presented.",
+								     "I identify with the average UK citizen."];
+					}
+					else
+					{
+						final_qs = [ "I identify with the average UK citizen."];
+					}
+
+					// Add final questions
+					id = questions_personality.length;
+					for (var i=0; i<final_qs.length; i++)
+					{
+						var q=final_qs[i];
+						questions_personality.push({id:id++, qtext2:"", color_qtext:"#000000FF",
+													qtext:q, qtext3:"How much do you agree?",
+													label1:"Strongly agree",label2:"Strongly disagree"});
+					}								     
+					len_personality = questions_personality.length;
+
+				}
+
+				ajax(filename, params_str, load, callback);
+			}            
+
+			function make_user_id(length)
+			{
+			   var result           = '';
+			   var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+			   var charactersLength = characters.length;
+			   for ( var i = 0; i < length; i++ )
+			      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+			   
+			   return result;
+			}
+
+			// SETUP
+
+			// get parameters from URL
+			const queryString = window.location.search;
+			const urlParams = new URLSearchParams(queryString);
+			var user_id = urlParams.get('id');
+
+			var round = 'wave1';
+			var is_question;
+			var idx_test_q, idx_survey_q, idx_personality_q;
+			var question_indices;
+			var final_qs;
+
+			var soc_infos;
+
+
+			var current_screen = -1;
+
+			// for debugging
+			//current_screen = 25;
+
+			var first_screen = { qtext:"", qtext2:"", qtext3:"Public opinion study", color_qtext:'#000000'}
+			var pre_test_screen = { qtext:"First, let's practice with two test questions.", qtext2:"", qtext3:"", color_qtext:'#000000FF'}
+			var pre_survey_screen = { qtext:"Now that we are done with the practice questions, let's start.", qtext2:"", qtext3:"", color_qtext:'#000000FF'}
+			var ranking_screen = { qtext:"", qtext2:"Now, regardless of your opinion, please sort the same issues on the line, from most important (top) to least important (bottom).", qtext3:"", color_qtext:'#000000FF'}
+			var pre_personality_screen = { qtext:"We will now ask you a series of questions about yourself.", qtext2:"", qtext3:"", color_qtext:'#000000FF'}
+			var thankyou_screen = { qtext:"To participate in the next session, please enter your email below. We will use your email for no other purposes other than to contact you in regard to this survey and will delete it after you participate or after 90 days, whichever comes first.", qtext2:"Thank you for participating!", qtext3:"To complete the second session and earn a \u00A35 Amazon voucher, please enter your email below.", color_qtext:'#000000'}
+			var final_screen = { qtext: "", qtext2:"You can close this page now.", qtext3:"", color_qtext:'#000000'}
+
+			var isMobile = window.mobileCheck();
+			if( !isMobile )
+			{
+				final_screen['qtext2'] = "Please open this page on a mobile phone."
+				current_screen = 30;
+				$("#paragraph").hide();
+				$("#next").hide();
+			}
+
+			if( user_id == null )
+			{
+				// give user a random ID
+				var url = window.location.href;    
+				user_id = make_user_id(20);
+				if (url.indexOf('?') > -1)
+				{
+				   url += '&id='+user_id
+				}
+				else
+				{
+				   url += '?id='+user_id
+				}
+
+				round = 'wave1';
+				window.location.href = url;	
+
+				// or, when this page should not be run without an user ID
+				/*final_screen['qtext2']  = "An error has occurred.";
+				final_screen['qtext'] = "You can close this page now.";
+				current_screen = 30;
+				$("#paragraph").hide();
+				$("#next").hide();*/
+			}
+
+			// Load questions
+			var raw_questions;
+			var questions_personality = init_questions_personality();
+			var len_personality       = questions_personality.length;
+			var questions_survey      = init_questions_survey(user_id, load_socinfo_from_server);
+			var len_survey            = questions_survey.length;
+			var questions_test        = init_questions_test();
+			var len_test              = questions_test.length;
+			var final_questions;
+
+			// Load first screen
+			loadnextvasq();
+
+
+		function addSquare (currentDiv, content, xposition, yposition) { 
+		  // create a new div element 
+		  var newDiv = document.createElement("div"); 
+		  // and give it some content 
+		  var newContent = document.createTextNode(content); 
+		  // add the text node to the newly created div
+		  newDiv.appendChild(newContent); 
+
+	  	  // set a class
+		  newDiv.setAttribute('class', 'draggablesquare');
+		  newDiv.style.left = xposition+'px'
+		  newDiv.style.top  = yposition+'px'
+
+		  document.body.insertBefore(newDiv, currentDiv); 
+		  return newDiv;
+		}
+
+		function add_issue_squares()
+		{
+			issue_names = ["Climate change","Social inequality","Human rights","Women's rights","LGBTQ+ rights",
+						   "Immigration","Fake news","Hate speech","EU membership","COVID-19"];
+
+			// add the newly created element and its content into the DOM 
+			var currentDiv = document.getElementById("next"); 
+			x0 = 30;
+			y0 = (window.innerHeight)*0.2;
+			spacing = (window.innerHeight)/16;
+
+			for(var j=0; j<(question_indices.length); j++)
+			{
+				xposition = x0;
+				yposition = y0 + spacing*j;
+				currentDiv = addSquare(currentDiv, issue_names[question_indices[j]], xposition, yposition);
+			}
+			for(var j=(question_indices.length); j<(issue_names.length); j++)
+			{
+				xposition = x0;
+				yposition = y0 + spacing*j;
+				currentDiv = addSquare(currentDiv, issue_names[j], xposition, yposition);			
+			}
+
+			// add line
+			var newDiv = document.createElement("div"); 
+  		    // set a class
+			newDiv.setAttribute('class', 'vas-line');
+			newDiv.setAttribute('id', 'ruler');
+			newDiv.style.top  = (window.innerHeight)*0.2
+			newDiv.style.left = (window.innerWidth)*0.75
+			newDiv.style.height  = (window.innerHeight)*0.6
+			document.body.insertBefore(newDiv, currentDiv); 
+		}
+
+		function add_vas_dot()
+		{
+			var vas_scale = document.getElementById("vas-scale"); 
+			var vas_dot = document.createElement("div"); 
+
+  		    // set a class
+			vas_dot.setAttribute('class', 'draggabledot');
+			vas_dot.setAttribute('id', 'vas_dot');
+			vas_dot.style.left = '50%'
+			vas_dot.style.marginLeft = '-10px'
+			vas_dot.style.height  = '2px'
+			vas_dot.style.backgroundColor = '#000'
+			document.body.insertBefore(vas_dot, vas_scale); 			
+		}
+
+		// load and hide draggable squares
+		document.body.onload = function()
+		{	
+			add_issue_squares();
+
+			$(".draggablesquare").draggable({
+				  //axis: "y",
+				  cursor: "move",
+				  drag: function(event, ui){
+				  	minTopPosition = 135;
+					maxTopPosition = minTopPosition+490;
+				    var topPosition = ui.position.top;
+				    if (topPosition < minTopPosition)
+				    	{ ui.position.top = minTopPosition; }
+				    if (topPosition > maxTopPosition)
+				    	{ ui.position.top = maxTopPosition; }
+				  }
+				});
+
+			$(".draggablesquare").hide();
+			$("#ruler").hide()
+			$("#email").hide();
+			
+			add_vas_dot();
+			$(".draggabledot").hide();
+		}
+
+		});
+
+		// count time
+		var startTime, endTime;
+
+		function time_start()
+		{
+		  startTime = new Date();
+		}
+
+		function time_end()
+		{
+		  endTime = new Date();
+		  var timeDiff = endTime - startTime; //in ms
+		  // strip the ms
+		  //timeDiff /= 1000;
+
+		  // get seconds 
+		  //var seconds = Math.round(timeDiff);
+
+		  // output
+		  //console.log(timeDiff + " ms");
+
+		  return timeDiff;
+		}
+
+		</script>
+
+	<link rel="stylesheet" href="css/vas.css" type="text/css" media="screen" />
+	<link rel="stylesheet" href="css/style.css" type="text/css" media="screen" />
+	<link rel="stylesheet" href="css/draggable.css" type="text/css" media="screen" />
+	</head>
+	<body>
+		
+		<h2 id="qtext2" > Welcome!</h2>
+		<h2 id="qtext">Placeholder question text</h2>
+		<h1 id="qtext3">Placeholder question text</h1>
+
+		<p id="paragraph">Welcome! We are researchers from the University of Oxford and King's College London seeking to understand people's opinion on social and political issues.
+		<br><br>
+		If you want to participate, we will be asking your opinion on a series of social and political issues in <b>two sessions (5-10 minutes each)</b>, the first now and the second in two days. When you complete the second session, you will earn <b>&pound;5</b> in Amazon vouchers.
+		<br><br>
+		You are not obliged to take part in the study and you can later decide to withdraw from the study up to one month after participating by contacting the researchers.
+		<br><br>
+		Before you agree to participate, you can read all the necessary information about the nature of the study, including usage and protection of your data, <a href="files/participant_information_sheet.pdf"><u>here</u></a>. 
+		<br><br>
+		Please click if you agree to participate.</p>
+		
+
+		<div class="vas">
+			<div class="vas-content">
+			<div class="vas-label" id="label1">Strongly agree</div>
+			<div class="vas-scale">
+				<div class="vas-line" id="vas-line"></div>
+				<input type="hidden" id="vas_value" name="vas_value" value="NA">
+			</div>
+			<div class="vas-label" id="label2">Strongly disagree</div>
+			</div>
+		</div>
+
+		<div id="container">
+		    <div id="content">
+			<input type="text" id="email" name="email" placeholder="Email">
+		        <div class="next" id="next"><a href="javascript:void(0);">Continue</a></div>
+		    </div>
+		</div>
+		<!-- <div class="next" id="next"><a href="javascript:void(0);">Continue</a></div> -->
+
+	</body>
+</html>
