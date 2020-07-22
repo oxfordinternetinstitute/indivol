@@ -344,8 +344,8 @@
 						}
 						else
 						{
-							thankyou_screen['qtext'] = "We will send your Amazon voucher to the email you have provided. We will use your email for no other purposes other than to contact you in regard to this survey and will delete it after sending you the Amazon voucher.";
-							thankyou_screen['qtext3'] = "You can close this window now.";
+							thankyou_screen['qtext'] = "You can close this window now.";
+							thankyou_screen['qtext3'] = "";
 							$("#qtext").text(thankyou_screen["qtext"]);
 							$("#qtext3").text(thankyou_screen["qtext3"]);
 							$("#next").hide();
@@ -644,7 +644,7 @@
 			var pre_survey_screen = { qtext:"Now that we are done with the practice questions, let's start.", qtext2:"", qtext3:"", color_qtext:'#000000FF'}
 			var ranking_screen = { qtext:"", qtext2:"Now, regardless of your opinion, please sort the same issues on the line, from most important (top) to least important (bottom).", qtext3:"", color_qtext:'#000000FF'}
 			var pre_personality_screen = { qtext:"We will now ask you a series of questions about yourself.", qtext2:"", qtext3:"", color_qtext:'#000000FF'}
-			var thankyou_screen = { qtext:"To participate in the next session, please enter your email below. We will use your email for no other purposes other than to contact you in regard to this survey and will delete it after you participate or after 90 days, whichever comes first.", qtext2:"Thank you for participating!", qtext3:"To complete the second session and earn a \u00A35 Amazon voucher, please enter your email below.", color_qtext:'#000000'}
+			var thankyou_screen = { qtext:"To participate in the next session, please enter your email below. We will use your email for no other purposes other than to contact you in regard to this survey and will delete it after you participate or after 90 days, whichever comes first.", qtext2:"Thank you for participating!", qtext3:"To complete the second session of this study, please enter your email below.", color_qtext:'#000000'}
 			var final_screen = { qtext: "", qtext2:"You can close this page now.", qtext3:"", color_qtext:'#000000'}
 
 			var isMobile = window.mobileCheck();
@@ -829,7 +829,7 @@
 
 		<p id="paragraph">Welcome! We are researchers from the University of Oxford and King's College London seeking to understand people's opinion on social and political issues.
 		<br><br>
-		If you want to participate, we will be asking your opinion on a series of social and political issues in <b>two sessions (5-10 minutes each)</b>, the first now and the second in two days. When you complete the second session, you will earn <b>&pound;5</b> in Amazon vouchers.
+		If you want to participate, we will be asking your opinion on a series of social and political issues in <b>two sessions (5-10 minutes each)</b>, the first now and the second in two days. 
 		<br><br>
 		You are not obliged to take part in the study and you can later decide to withdraw from the study up to one month after participating by contacting the researchers.
 		<br><br>
