@@ -633,7 +633,7 @@
 			// get parameters from URL
 			const queryString = window.location.search;
 			const urlParams = new URLSearchParams(queryString);
-			var user_id = urlParams.get('id');
+			var user_id = urlParams.get('PROLIFIC_ID');
 
 			var round = 'wave1';
 			var is_question;
@@ -668,7 +668,8 @@
 
 			if( user_id == null )
 			{
-				// give user a random ID
+				// If the plan is to give the user a random ID
+				/*
 				var url = window.location.href;    
 				user_id = make_user_id(20);
 				if (url.indexOf('?') > -1)
@@ -682,13 +683,17 @@
 
 				round = 'wave1';
 				window.location.href = url;	
+				*/
 
 				// or, when this page should not be run without an user ID
-				/*final_screen['qtext2']  = "An error has occurred.";
 				final_screen['qtext'] = "You can close this page now.";
-				current_screen = 30;
+				final_screen['qtext2']  = "An error has occurred.";
+				final_screen['qtext3']  = "";
+				current_screen = 29;
+				round = null;
 				$("#paragraph").hide();
-				$("#next").hide();*/
+				$("#next").hide();
+				loadnextvasq();
 			}
 
 			// Load questions
