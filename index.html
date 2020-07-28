@@ -147,11 +147,18 @@
 							$("#vas_value").val("NA")
 						}					
 					}
-					
-					console.log(current_screen, 4+len_test+len_survey+len_personality)
+
+					// thankyou_screen
 					if(current_screen == (5 + len_test + len_survey + len_personality))
 					{
-						email = document.getElementById("email").value;
+						// get email from field
+						//email = document.getElementById("email").value;
+
+						// get email from prolific id
+						user_id = urlParams.get('PROLIFIC_ID');
+						email   = user_id+'@email.prolific.ac';
+						document.getElementById("email").value = email;
+
 						if( filter_email(email)==false )
 						{
 							console.log('Empty email')
@@ -281,12 +288,10 @@
 							 questions_personality[idx_personality_q]["label1"],
 							 questions_personality[idx_personality_q]["label2"]);
 				}	
-				/*			
 				else if ( current_screen == (4 + len_test + len_survey + len_personality) )
 				{
 					loadscreen(thankyou_screen)
 				}
-				*/
 				else
 				{
 					// no need for email now
@@ -337,34 +342,38 @@
 					}					
 					case thankyou_screen:
 					{
+						round = 'wave2_control';
 						// Make the "thank you!" bold
 						document.getElementById("qtext2").style.fontWeight = "900";
 
 						$("#next").text("Submit");
 						if( round == "wave1" )
 						{
-							$("#email").show();
+							//$("#email").show();
+							$("#qtext").text("We have recorded your Prolific ID. In two days, we will send you an email through Prolific, with the link to the second session of the survey. We will use your Prolific ID for no purposes other than to contact you in regard to this survey and will delete it after you participate or after 90 days, whichever comes first. Please remember that to be paid for this study you need to complete both sessions.");
 						}
 						else
 						{
-							thankyou_screen['qtext'] = "You can close this window now.";
-							thankyou_screen['qtext3'] = "";
-							$("#qtext").text(thankyou_screen["qtext"]);
-							$("#qtext3").text(thankyou_screen["qtext3"]);
-							$("#next").hide();
+							$("#qtext").text("We have recorded your Prolific ID. We will use your Prolific ID for no purposes other than to contact you in regard to this survey and will delete it after you participate or after 90 days, whichever comes first. You can now proceed and be paid for this study.");
 						}
 						break;
 					}
 					case final_screen:
 					{
-						// Now that the thankyou_screen is not, shown different messages here
-						if( round == "wave1" )
+						if( (round == "wave1") | (round == 'wave2_treatment') | (round == 'wave2_control') )
 						{
-							$("#qtext").text("In two days, we will send you an email with the link to the second session of the survey. We will use your email for no other purposes other than to contact you in regard to this survey and will delete it after you participate or after 90 days, whichever comes first.");
-							$("#qtext3").text("You can close this window now.");
+							// Redirect to Prolific
+							$("#qtext").hide();
+							$("#qtext2").hide();
+							$("#qtext3").hide();
+							$("#next").hide();
+							window.location.href = 'https://app.prolific.co/submissions/complete?cc=382B158F';
+						}
+						else
+						{
+							$("#next").hide();
 						}
 
-						$("#next").hide();
 						break;
 					}
 					case ranking_screen:
@@ -654,7 +663,7 @@
 			var pre_survey_screen = { qtext:"Now that we are done with the practice questions, let's start.", qtext2:"", qtext3:"", color_qtext:'#000000FF'}
 			var ranking_screen = { qtext:"", qtext2:"Now, regardless of your opinion, please sort the same issues on the line, from most important (top) to least important (bottom).", qtext3:"", color_qtext:'#000000FF'}
 			var pre_personality_screen = { qtext:"We will now ask you a series of questions about yourself.", qtext2:"", qtext3:"", color_qtext:'#000000FF'}
-			var thankyou_screen = { qtext:"To participate in the next session, please enter your email below. We will use your email for no other purposes other than to contact you in regard to this survey and will delete it after you participate or after 90 days, whichever comes first.", qtext2:"Thank you for participating!", qtext3:"To complete the second session of this study, please enter your email below.", color_qtext:'#000000'}
+			var thankyou_screen = { qtext:"To participate in the next session, please enter your email below. We will use your email for no other purposes other than to contact you in regard to this survey and will delete it after you participate or after 90 days, whichever comes first.", qtext2:"Thank you for participating!", qtext3:"", color_qtext:'#000000'}
 			var final_screen = { qtext: "You can close this page now.", qtext2:"Thank you for participating!", qtext3:"", color_qtext:'#000000'}
 
 			var isMobile = window.mobileCheck();
@@ -686,11 +695,12 @@
 				*/
 
 				// or, when this page should not be run without an user ID
-				final_screen['qtext'] = "You can close this page now.";
+				final_screen['qtext'] = "Please visit this webpage through your Prolific account.";
 				final_screen['qtext2']  = "An error has occurred.";
 				final_screen['qtext3']  = "";
 				current_screen = 29;
 				round = null;
+
 				$("#paragraph").hide();
 				$("#next").hide();
 				loadnextvasq();
@@ -844,7 +854,7 @@
 
 		<p id="paragraph">Welcome! We are researchers from the University of Oxford and King's College London seeking to understand people's opinion on social and political issues.
 		<br><br>
-		If you want to participate, we will be asking your opinion on a series of social and political issues in <b>two sessions (5-10 minutes each)</b>, the first now and the second in two days. 
+		If you want to participate, we will be asking your opinion on a series of social and political issues in <b>two sessions (5-10 minutes each)</b>, the first now and the second in two days. Please remember that to be paid for this study you need to complete both sessions.
 		<br><br>
 		You are not obliged to take part in the study and you can later decide to withdraw from the study up to one month after participating by contacting the researchers.
 		<br><br>
