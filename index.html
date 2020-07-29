@@ -643,6 +643,7 @@
 			const queryString = window.location.search;
 			const urlParams = new URLSearchParams(queryString);
 			var user_id = urlParams.get('PROLIFIC_ID');
+			console.log(user_id);
 
 			var round = 'wave1';
 			var is_question;
@@ -669,13 +670,13 @@
 			var isMobile = window.mobileCheck();
 			if( !isMobile )
 			{
-				final_screen['qtext2'] = "Please open this page on a mobile phone."
-				current_screen = 30;
+				final_screen['qtext'] = "Please open this page on a mobile phone."
+				current_screen = 29;
+				round = null;
 				$("#paragraph").hide();
 				$("#next").hide();
 			}
-
-			if( user_id == null )
+			else if( user_id == null )
 			{
 				// If the plan is to give the user a random ID
 				/*
