@@ -155,7 +155,7 @@
 						//email = document.getElementById("email").value;
 
 						// get email from prolific id
-						user_id = urlParams.get('PROLIFIC_ID');
+						user_id = urlParams.get('PROLIFIC_PID');
 						email   = user_id+'@email.prolific.ac';
 						document.getElementById("email").value = email;
 
@@ -295,7 +295,7 @@
 				else
 				{
 					// no need for email now
-					//save_email();
+					save_email();
 					loadscreen(final_screen) 
 				}
 				current_screen++;
@@ -342,7 +342,6 @@
 					}					
 					case thankyou_screen:
 					{
-						round = 'wave2_control';
 						// Make the "thank you!" bold
 						document.getElementById("qtext2").style.fontWeight = "900";
 
@@ -642,7 +641,7 @@
 			// get parameters from URL
 			const queryString = window.location.search;
 			const urlParams = new URLSearchParams(queryString);
-			var user_id = urlParams.get('PROLIFIC_ID');
+			var user_id = urlParams.get('PROLIFIC_PID');
 			console.log(user_id);
 
 			var round = 'wave1';

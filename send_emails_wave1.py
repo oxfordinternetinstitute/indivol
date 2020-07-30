@@ -15,7 +15,7 @@ Thank you for completing the first session of our study on public opinion.
 
 As indicated in the survey you just took, this study consists of two sessions (5-10 minutes each). 
 In two days, we will e-mail you the link to the second session. 
-Once you complete the second session you will receive your £5 Amazon Voucher. 
+Please remember that to be paid for this study you need to complete both sessions.
 
 Once again thank you for your time and participation. 
 

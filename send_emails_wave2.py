@@ -165,7 +165,7 @@ Today is the time to complete the second session of our study (5-10 minutes long
 
 https://surveys.oii.ox.ac.uk/?id={}
 
-Once you complete this second session you will receive your £5 Amazon Voucher. 
+Please remember that to be paid for this study you need to complete both sessions.
 
 Once again thank you for your time and participation. 
 
