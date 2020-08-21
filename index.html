@@ -10,6 +10,7 @@
 		<script src = "https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
 		<script src="js/jquery.ui.touch-punch.min.js"></script>
 		<script src="js/mobile-check.js"></script>
+		<script src="js/round2.js"></script> 
 
 		<link rel="shortcut icon" type="image/ico" href="images/favicon.ico">
 
@@ -151,19 +152,23 @@
 					// thankyou_screen
 					if(current_screen == (5 + len_test + len_survey + len_personality))
 					{
-						// get email from field
-						//email = document.getElementById("email").value;
+						if(round == 'wave1')
+						{
+							// get email from prolific id
+							user_id = urlParams.get('PROLIFIC_PID');
+							email   = user_id+'@email.prolific.ac';
+							document.getElementById("email").value = email;
+						}
 
-						// get email from prolific id
-						user_id = urlParams.get('PROLIFIC_PID');
-						email   = user_id+'@email.prolific.ac';
-						document.getElementById("email").value = email;
+						// get email from field
+						email = document.getElementById("email").value;
+						email = user_id+'@email.prolific.ac';
 
 						if( filter_email(email)==false )
 						{
 							console.log('Empty email')
 							document.getElementById("email").value = ''
-							document.getElementById("email").placeholder = 'Fill email here'
+							document.getElementById("email").placeholder = 'Prolific ID'
 							document.getElementById("email").style.backgroundColor = '#FFF666';
 
 							return false;
@@ -294,7 +299,6 @@
 				}
 				else
 				{
-					// no need for email now
 					save_email();
 					loadscreen(final_screen) 
 				}
@@ -349,17 +353,20 @@
 						if( round == "wave1" )
 						{
 							//$("#email").show();
-							$("#qtext").text("We have recorded your Prolific ID. In two days, we will send you an email through Prolific, with the link to the second session of the survey. We will use your Prolific ID for no purposes other than to contact you in regard to this survey and will delete it after you participate or after 90 days, whichever comes first. Please remember that to be paid for this study you need to complete both sessions. Please press below to submit your responses and return to Prolific.");
+							$("#qtext").text("We have recorded your Prolific ID. In two days, we will send you a message through Prolific, with the link to the second session of the survey. We will use your Prolific ID for no purposes other than to contact you in regard to this survey and will delete it after you participate or after 90 days, whichever comes first. Please remember to check your Prolific inbox, and remember that to be paid for this study you need to complete both sessions. Please press below to submit your responses and return to Prolific.");
 						}
 						else
 						{
-							$("#qtext").text("We have recorded your Prolific ID. We will use your Prolific ID for no purposes other than to contact you in regard to this survey and will delete it after you participate or after 90 days, whichever comes first. You can now proceed and be paid for this study. Please press below to submit your responses and return to Prolific.");
+							$("#email").show();
+							$("#qtext2").text("");
+							$("#qtext").text("We have recorded your Prolific ID. We will use your Prolific ID for no purposes other than to contact you in regard to this survey and will delete it after you participate or after 90 days, whichever comes first. You can now proceed and be paid for this study.");
 						}
 						break;
 					}
 					case final_screen:
 					{
-						if( (round == "wave1") | (round == 'wave2_treatment') | (round == 'wave2_control') )
+						console.log(round)
+						if( (round == "wave1") | (round=="wave2_control") | (round=="wave2_treatment") )
 						{
 							// Redirect to Prolific
 							$("#qtext").hide();
@@ -636,6 +643,16 @@
 			   return result;
 			}
 
+			function get_wave2_id()
+			{
+			   idx = Math.floor(Math.random() * 10000);
+			   id  = round2ids[idx];
+			   delete round2ids;
+
+			   return id;
+			}
+
+
 			// SETUP
 
 			// get parameters from URL
@@ -677,20 +694,21 @@
 			}
 			else if( user_id == null )
 			{
-				// If the plan is to give the user a random ID
 				/*
+				// If the plan is to give the user a random ID
 				var url = window.location.href;    
-				user_id = make_user_id(20);
+
+				//user_id = make_user_id(20);
+				user_id = get_wave2_id();
+
 				if (url.indexOf('?') > -1)
 				{
-				   url += '&id='+user_id
+				   url += '&PROLIFIC_PID='+user_id
 				}
 				else
 				{
-				   url += '?id='+user_id
+				   url += '?PROLIFIC_PID='+user_id
 				}
-
-				round = 'wave1';
 				window.location.href = url;	
 				*/
 
@@ -700,10 +718,10 @@
 				final_screen['qtext3']  = "";
 				current_screen = 29;
 				round = null;
-
 				$("#paragraph").hide();
 				$("#next").hide();
 				loadnextvasq();
+
 			}
 
 			// Load questions
@@ -876,7 +894,7 @@
 
 		<div id="container">
 		    <div id="content">
-			<input type="text" id="email" name="email" placeholder="Email">
+			<input type="text" id="email" name="email" placeholder="Prolific ID">
 		        <div class="next" id="next"><a href="javascript:void(0);">Continue</a></div>
 		    </div>
 		</div>
