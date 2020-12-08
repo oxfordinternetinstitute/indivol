@@ -39,10 +39,8 @@ except AttributeError:
     timestamp = (dt-datetime(1970, 1, 1)).total_seconds() - 3600
     two_days_ago = int(round(timestamp))
 
-
 # prepare query string
-mySql_insert_query  = "SELECT * FROM logging WHERE (section='email_wave1') "
-mySql_insert_query += "AND (payload!='') "
+mySql_insert_query  = "SELECT * FROM logging WHERE (section='rankings_wave1') "
 mySql_insert_query += "AND (datetime < {}) AND (datetime >= {});"
 
 mySql_insert_query = mySql_insert_query.format(yesterday,two_days_ago)

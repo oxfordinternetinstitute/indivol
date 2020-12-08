@@ -163,7 +163,7 @@ Thank you again for participating in our study on public opinion. We very much a
 
 Today is the time to complete the second session of our study (5-10 minutes long). Please follow the link below to do so:
 
-https://surveys.oii.ox.ac.uk/?id={}
+https://surveys.oii.ox.ac.uk/?id={}&PROLIFIC_PID={}
 
 Please remember that to be paid for this study you need to complete both sessions.
 
@@ -183,7 +183,7 @@ for userid,email_to in zip(userids,emails):
     userid2 = str(old_to_new_userids[userid])
     print 'Sending email to '+userid+' at email '+email_to+' with link containing '+userid2
 
-    email_text = email_message.format(userid2)
+    email_text = email_message.format(userid2,userid2)
     msg = MIMEText(email_text, 'plain', 'utf-8')
     msg['To']      = email_to
     msg['From']    = email_from
